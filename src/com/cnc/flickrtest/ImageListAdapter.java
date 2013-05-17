@@ -130,11 +130,17 @@ public class ImageListAdapter extends BaseAdapter
 			holder =(ViewHolder)convertView.getTag();
 		}
 		holder.pic.setImageBitmap(bitmaps.get(position));
-//		holder.avatar.setImageBitmap(bitmaps.get(position));
+////		holder.avatar.setImageBitmap(bitmaps.get(position));
 		holder.userName.setText(photoes.get(position).getOwner().getUsername());
 		holder.userLocation.setText(photoes.get(position).getOwner().getLocation());
 		holder.dateUped.setText(String.valueOf(photoes.get(position).getDatePosted()));
-		holder.viewCount.setText(photoes.get(position).getViews());
+		holder.viewCount.setText(String.valueOf(photoes.get(position).getViews()));
+		
+//		holder.avatar.setImageBitmap(bitmaps.get(position));
+//		holder.userName.setText("Ha");
+//		holder.userLocation.setText("HCM");
+//		holder.dateUped.setText("20022002");
+//		holder.viewCount.setText("1000000");
  
 		return convertView;
 	}
