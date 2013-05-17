@@ -8,18 +8,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name" />
-
     <EditText
         android:id="@+id/editText1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/textView1"
         android:layout_marginTop="26dp"
        
         android:ems="10"
@@ -34,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/editText1"
         android:layout_alignParentRight="true"
-        android:text="Search" />
+        android:text="@string/search" />
 
     <ImageView
         android:id="@+id/imageView1"
@@ -46,4 +38,11 @@
         android:contentDescription="@string/desc"
          />
 
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/editText1" >
+        
+    </ListView>
 </RelativeLayout>

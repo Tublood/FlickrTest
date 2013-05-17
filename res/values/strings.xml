@@ -6,4 +6,5 @@
     <string name="hello_world">Hello world!</string>
     <string name="image">Image\'s name</string>
 	<string name="desc">desc</string>
+	<string name="search">Search</string>
 </resources>
