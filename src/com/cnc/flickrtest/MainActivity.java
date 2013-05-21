@@ -1,7 +1,11 @@
 package com.cnc.flickrtest;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -9,7 +13,13 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.googlecode.flickrjandroid.Flickr;
 import com.googlecode.flickrjandroid.FlickrException;
@@ -93,7 +103,10 @@ public class MainActivity extends Activity {
 					long arg3) 
 			{
 				Photo photo = adapter.getPhoto(arg2);
-				Intent t = new Intent( MainActivity.this, ShowDetailActivity.class );
+//				Intent t = new Intent( MainActivity.this, ShowDetailActivity.class );
+//				t.putExtra( "photo", photo);
+//				startActivity(t);
+				Intent t = new Intent( MainActivity.this, InfoActivity.class );
 				t.putExtra( "photo", photo);
 				startActivity(t);
 //				MainActivity.this.finish();
@@ -172,13 +185,34 @@ public class MainActivity extends Activity {
 						// get photo object
 						final Photo photo = (Photo) photoList.get(i);
 						Log.d("pic:" + String.valueOf(i), photo.getTitle());
+						Log.d("id:" + String.valueOf(i), photo.getId());
 
+						
+						//Load image						
 						final String url = photoList.get(i).getSmallUrl();
 						try {
 							final InputStream is = (InputStream) new URL(url)
 									.getContent();
 							final Bitmap bm = BitmapFactory.decodeStream(is);
-
+							//Load user information
+							String  userName 		= null,
+									userLocation 	= null,
+									date			= null,
+									viewCount 		= null,
+									iconFarm, server, nsid;							
+							JSONObject JsonObject 	= new JSONObject(QueryFlickrUser(photo.getId()));
+							userName				= JsonObject.getJSONObject("photo").getJSONObject("owner").getString("username");
+							userLocation			= JsonObject.getJSONObject("photo").getJSONObject("owner").getString("location");
+							date					= JsonObject.getJSONObject("photo").getJSONObject("dates").getString("taken");
+							viewCount				= JsonObject.getJSONObject("photo").getString("views");
+							iconFarm				= JsonObject.getJSONObject("photo").getJSONObject("owner").getString("iconfarm");
+							server					= JsonObject.getJSONObject("photo").getJSONObject("owner").getString("iconserver");
+							nsid					= JsonObject.getJSONObject("photo").getJSONObject("owner").getString("nsid");
+							final Bitmap avatar		= getAvatar(iconFarm, server, nsid);
+							final String a  		= userName, 
+										 b 			= userLocation,
+										 c			= date,
+										 d			= viewCount;
 							m_handler.post(new Runnable() 
 							{
 								@Override
@@ -188,12 +222,20 @@ public class MainActivity extends Activity {
 									
 									adapter.addPhoto(photo);
 									adapter.addBitmap(bm);
+									adapter.addAvatar(avatar);
+									adapter.addUserName(a);
+									adapter.addUserLocation(b);
+									adapter.addPhotoDate(c);
+									adapter.addViewCount(d);
 									adapter.notifyDataSetChanged();									
 									Log.d("Load Image", "loaded");
 								}
 							});
 						} catch (final IOException e) 
 						{
+							e.printStackTrace();
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
@@ -226,5 +268,111 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+//------------------------------------
+//	String FlickrQuery_url1 = "http://api.flickr.com/services/rest/?method=flickr.people.getinfo";
+	String FlickrQuery_url1 = "http://api.flickr.com/services/rest/?method=flickr.photos.getinfo";
+//	String FlickrQuery_user = "&user_id=";
+	String FlickrQuery_photo = "&photo_id=";
+	String FlickrQuery_nojsoncallback = "&nojsoncallback=1";
+	String FlickrQuery_format = "&format=json";
+	String FlickrApiKey = "2cb46fe99c9874b4ac741ce4a74e351c";
+	String FlickrQuery_key = "&api_key=";
+	private String QueryFlickrUser(String photoID) 
+	{
 
+		String qResult = null;
+
+		String qString =
+
+		FlickrQuery_url1
+
+		+ FlickrQuery_nojsoncallback
+
+		+ FlickrQuery_format
+
+		+ FlickrQuery_key + FlickrApiKey
+		+ FlickrQuery_photo + photoID;
+
+		HttpClient httpClient = new DefaultHttpClient();
+
+		HttpGet httpGet = new HttpGet(qString);
+
+		try {
+
+			HttpEntity httpEntity = httpClient.execute(httpGet).getEntity();
+
+			if (httpEntity != null) {
+
+				InputStream inputStream = httpEntity.getContent();
+
+				Reader in = new InputStreamReader(inputStream);
+
+				BufferedReader bufferedreader = new BufferedReader(in);
+
+				StringBuilder stringBuilder = new StringBuilder();
+
+				String stringReadLine = null;
+
+				while ((stringReadLine = bufferedreader.readLine()) != null) {
+
+					stringBuilder.append(stringReadLine + "\n");
+
+				}
+
+				qResult = stringBuilder.toString();
+
+			}
+
+		} catch (ClientProtocolException e) {
+
+			// TODO Auto-generated catch block
+
+			e.printStackTrace();
+
+		} catch (IOException e) {
+
+			// TODO Auto-generated catch block
+
+			e.printStackTrace();
+
+		}
+
+		return qResult;
+
+	}
+
+	public Bitmap getAvatar( String iconFarm, String Server, String nsid)
+	{
+		Bitmap bm= null;
+	    
+	    String FlickrPhotoPath =
+	        "http://farm" + iconFarm + ".static.flickr.com/"
+	        + Server + "/buddyicons/" + nsid + ".jpg";
+	    
+	    URL FlickrPhotoUrl = null;
+	    
+	    try 
+	    {
+	    FlickrPhotoUrl = new URL(FlickrPhotoPath);
+	  
+	    HttpURLConnection httpConnection
+	       = (HttpURLConnection) FlickrPhotoUrl.openConnection();
+	    httpConnection.setDoInput(true);
+	    httpConnection.connect();
+	    InputStream inputStream = httpConnection.getInputStream();
+	    bm = BitmapFactory.decodeStream(inputStream);
+	  
+	   
+	    } catch (MalformedURLException e)
+	    {
+	    	e.printStackTrace();
+	    } catch (IOException e) 
+	    {
+	    
+	    	e.printStackTrace();
+	    }
+	    
+	    return bm;
+	  
+	}
 }

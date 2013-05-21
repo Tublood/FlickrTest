@@ -1,12 +1,14 @@
 package com.cnc.flickrtest;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.googlecode.flickrjandroid.photos.Photo;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,11 +83,21 @@ public class ImageListAdapter extends BaseAdapter
 	private Context 	context;
 	private List<Photo> photoes;
 	private List<Bitmap> bitmaps;
+	private List<Bitmap> avatar;
+	private List<String> usernames;
+	private List<String> userLocation;
+	private List<String>   photoDate;
+	private List<String>   views;
 	public ImageListAdapter(Context context) 
 	{	
 		this.context	= context;
 		photoes			= new ArrayList<Photo>();
 		bitmaps			= new ArrayList<Bitmap>();
+		avatar			= new ArrayList<Bitmap>();
+		usernames		= new ArrayList<String>();
+		userLocation	= new ArrayList<String>();
+		photoDate		= new ArrayList<String>();
+		views			= new ArrayList<String>();
 
 	}
 
@@ -97,14 +109,40 @@ public class ImageListAdapter extends BaseAdapter
 	{
 		bitmaps.add(bm);
 	}
+	public void addAvatar(Bitmap avatarBitmap)
+	{
+		avatar.add(avatarBitmap);
+	}
+	public void addUserName( String name )
+	{
+		usernames.add(name);
+	}
+	public void addUserLocation( String location )
+	{
+		userLocation.add(location);
+	}
+	public void addPhotoDate(String date)
+	{
+		photoDate.add(date);
+	}
+	public void addViewCount(String viewCount)
+	{
+		views.add(viewCount);
+	}
 	public Photo getPhoto(int position)
 	{
 		return photoes.get(position);
 	}
+	
 	public void clearSearchData()
 	{
 		photoes.clear();
 		bitmaps.clear();
+		usernames.clear();
+		userLocation.clear();
+		photoDate.clear();
+		views.clear();
+		avatar.clear();
 	}
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) 
@@ -130,11 +168,12 @@ public class ImageListAdapter extends BaseAdapter
 			holder =(ViewHolder)convertView.getTag();
 		}
 		holder.pic.setImageBitmap(bitmaps.get(position));
-////		holder.avatar.setImageBitmap(bitmaps.get(position));
-		holder.userName.setText(photoes.get(position).getOwner().getUsername());
-		holder.userLocation.setText(photoes.get(position).getOwner().getLocation());
-		holder.dateUped.setText(String.valueOf(photoes.get(position).getDatePosted()));
-		holder.viewCount.setText(String.valueOf(photoes.get(position).getViews()));
+		holder.avatar.setImageBitmap(avatar.get(position));
+		holder.userName.setText(usernames.get(position));
+		holder.userLocation.setText(userLocation.get(position));
+//		holder.userLocation.setText(photoes.get(position).getOwner().getLocation());
+		holder.dateUped.setText(photoDate.get(position));
+		holder.viewCount.setText(views.get(position));
 		
 //		holder.avatar.setImageBitmap(bitmaps.get(position));
 //		holder.userName.setText("Ha");
