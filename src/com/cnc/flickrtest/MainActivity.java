@@ -29,6 +29,13 @@ import com.googlecode.flickrjandroid.photos.PhotoList;
 import com.googlecode.flickrjandroid.photos.PhotosInterface;
 import com.googlecode.flickrjandroid.photos.SearchParameters;
 
+import android.app.Application;
+
+import com.novoda.imageloader.core.ImageManager;
+import com.novoda.imageloader.core.LoaderSettings;
+import com.novoda.imageloader.core.LoaderSettings.SettingsBuilder;
+import com.novoda.imageloader.core.cache.LruBitmapCache;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.app.Activity;
@@ -49,99 +56,128 @@ import android.widget.ListView;
 
 public class MainActivity extends Activity {
 
-	private Handler 		 m_handler = new Handler();
-	private List<Photo> 	 photoes   = new ArrayList<Photo>();
-	private List<Bitmap>	 bitmaps   = new ArrayList<Bitmap>();
-	private int				 page 	   = 1;
-	private ImageView 		 view;
-	private Button 			 button;
-	private EditText 		 editText;
-	private ListView		 listview;
-	private boolean			 isLoading;
-	
+	private Handler m_handler = new Handler();
+	private List<Photo> photoes = new ArrayList<Photo>();
+	private List<Bitmap> bitmaps = new ArrayList<Bitmap>();
+	private int page = 1;
+	private ImageView view;
+	private Button button;
+	private EditText editText;
+	private ListView listview;
+	private boolean isLoading;
+
 	private ImageListAdapter adapter;
+	
+	public static ImageManager imageManager;
+
 	@Override
-	protected void onCreate(Bundle savedInstanceState) 
-	{
+	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		button 		= (Button) findViewById(R.id.button1);
-		editText 	= (EditText) findViewById(R.id.editText1);
-		view 		= (ImageView) findViewById(R.id.imageView1);
-		listview 	= (ListView)findViewById(R.id.listview);
-		adapter 	= new ImageListAdapter(this);
+		normalImageManagerSettings();
+		button = (Button) findViewById(R.id.button1);
+		editText = (EditText) findViewById(R.id.editText1);
+		view = (ImageView) findViewById(R.id.imageView1);
+		listview = (ListView) findViewById(R.id.listview);
+		adapter = new ImageListAdapter(this);
 		listview.setAdapter(adapter);
-		listview.setOnScrollListener(new ListView.OnScrollListener() 
-		{
+		listview.setOnScrollListener(new ListView.OnScrollListener() {
 			@Override
-			public void onScrollStateChanged(AbsListView arg0, int arg1) 
-			{
-			}		
-					
+			public void onScrollStateChanged(AbsListView arg0, int arg1) {
+			}
+
 			@Override
-			public void onScroll(AbsListView arg0, int arg1, int arg2, int arg3)
-			{
-				//arg1 = firstVisibleItem
-				//arg2 = visibleItemCount
-				//arg3 = totalItemCount
+			public void onScroll(AbsListView arg0, int arg1, int arg2, int arg3) {
+				// arg1 = firstVisibleItem
+				// arg2 = visibleItemCount
+				// arg3 = totalItemCount
 				int loadedItems = arg1 + arg2;
-				if((loadedItems == arg3) && !isLoading)
-				{
-					isLoading	= true;
+				if ((loadedItems == arg3) && !isLoading) {
+					isLoading = true;
 					continueSearch(editText.getText().toString());
 				}
 			}
-			
-			
+
 		});
 
-		listview.setOnItemClickListener(new OnItemClickListener() 
-		{
+		listview.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) 
-			{
+					long arg3) {
 				Photo photo = adapter.getPhoto(arg2);
-//				Intent t = new Intent( MainActivity.this, ShowDetailActivity.class );
-//				t.putExtra( "photo", photo);
-//				startActivity(t);
-				Intent t = new Intent( MainActivity.this, InfoActivity.class );
-				t.putExtra( "photo", photo);
+				// Intent t = new Intent( MainActivity.this,
+				// ShowDetailActivity.class );
+				// t.putExtra( "photo", photo);
+				// startActivity(t);
+				Intent t = new Intent(MainActivity.this, ShowDetailActivity.class);
+				t.putExtra("photo", photo);
 				startActivity(t);
-//				MainActivity.this.finish();
+				// MainActivity.this.finish();
 			}
 
-
 		});
-		button.setOnClickListener(new Button.OnClickListener()
-		{
+		button.setOnClickListener(new Button.OnClickListener() {
 			@Override
-			public void onClick(View arg0) 
-			{
+			public void onClick(View arg0) {
 				newSearch(editText.getText().toString());
-//				search(editText.getText().toString());
+				// search(editText.getText().toString());
 			}
 		});
 
 	}
 
-	public void search(final String string)
-	{
-		Thread t = new Thread() 
-		{
-			public void run() 
-			{
+	private void normalImageManagerSettings() {
+		imageManager = new ImageManager(this, new SettingsBuilder()
+				.withCacheManager(new LruBitmapCache(this)).build(this));
+	}
+
+	@SuppressWarnings("unused")
+	private void verboseImageManagerSettings() {
+		SettingsBuilder settingsBuilder = new SettingsBuilder();
+
+		// You can force the urlConnection to disconnect after every call.
+		settingsBuilder.withDisconnectOnEveryCall(true);
+
+		// We have different types of cache, check cache package for more info
+		settingsBuilder.withCacheManager(new LruBitmapCache(this));
+
+		// You can set a specific read timeout
+		settingsBuilder.withReadTimeout(30000);
+
+		// You can set a specific connection timeout
+		settingsBuilder.withConnectionTimeout(30000);
+
+		// You can disable the multi-threading ability to download image
+		settingsBuilder.withAsyncTasks(false);
+
+		// You can set a specific directory for caching files on the sdcard
+		// settingsBuilder.withCacheDir(new File("/something"));
+
+		// Setting this to false means that file cache will use the url without
+		// the query part
+		// for the generation of the hashname
+		settingsBuilder.withEnableQueryInHashGeneration(false);
+
+		LoaderSettings loaderSettings = settingsBuilder.build(this);
+		imageManager = new ImageManager(this, loaderSettings);
+	}
+
+	public static ImageManager getImageLoader() {
+		return imageManager;
+	}
+
+	public void search(final String string) {
+		Thread t = new Thread() {
+			public void run() {
 				String key = "2cb46fe99c9874b4ac741ce4a74e351c";
 				String svr = "www.flickr.com";
 
 				REST rest = null;
-				try 
-				{
+				try {
 					rest = new REST();
 					rest.setHost(svr);
-				} catch (ParserConfigurationException e) 
-				{
+				} catch (ParserConfigurationException e) {
 					e.printStackTrace();
 				}
 
@@ -161,65 +197,62 @@ public class MainActivity extends Activity {
 				PhotosInterface photosInterface = flickr.getPhotosInterface();
 				// Execute search with entered tags
 				PhotoList photoList = null;
-				try 
-				{
+				try {
 					photoList = photosInterface.search(searchParams, 10, page);
-				} catch (IOException e) 
-				{
+				} catch (IOException e) {
 					e.printStackTrace();
-				} catch (FlickrException e) 
-				{
+				} catch (FlickrException e) {
 					e.printStackTrace();
-				} catch (JSONException e) 
-				{
+				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 
 				// get search result and fetch the photo object and get small
 				// square imag's url
-				if (photoList != null) 
-				{
+				if (photoList != null) {
 					// Get search result and check the size of photo result
-					for (int i = 0; i < photoList.size(); i++) 
-					{
+					for (int i = 0; i < photoList.size(); i++) {
 						// get photo object
 						final Photo photo = (Photo) photoList.get(i);
 						Log.d("pic:" + String.valueOf(i), photo.getTitle());
 						Log.d("id:" + String.valueOf(i), photo.getId());
 
-						
-						//Load image						
+						// Load image
 						final String url = photoList.get(i).getSmallUrl();
 						try {
 							final InputStream is = (InputStream) new URL(url)
 									.getContent();
 							final Bitmap bm = BitmapFactory.decodeStream(is);
-							//Load user information
-							String  userName 		= null,
-									userLocation 	= null,
-									date			= null,
-									viewCount 		= null,
-									iconFarm, server, nsid;							
-							JSONObject JsonObject 	= new JSONObject(QueryFlickrUser(photo.getId()));
-							userName				= JsonObject.getJSONObject("photo").getJSONObject("owner").getString("username");
-							userLocation			= JsonObject.getJSONObject("photo").getJSONObject("owner").getString("location");
-							date					= JsonObject.getJSONObject("photo").getJSONObject("dates").getString("taken");
-							viewCount				= JsonObject.getJSONObject("photo").getString("views");
-							iconFarm				= JsonObject.getJSONObject("photo").getJSONObject("owner").getString("iconfarm");
-							server					= JsonObject.getJSONObject("photo").getJSONObject("owner").getString("iconserver");
-							nsid					= JsonObject.getJSONObject("photo").getJSONObject("owner").getString("nsid");
-							final Bitmap avatar		= getAvatar(iconFarm, server, nsid);
-							final String a  		= userName, 
-										 b 			= userLocation,
-										 c			= date,
-										 d			= viewCount;
-							m_handler.post(new Runnable() 
-							{
+							// Load user information
+							String userName = null, userLocation = null, date = null, viewCount = null, iconFarm, server, nsid;
+							JSONObject JsonObject = new JSONObject(
+									QueryFlickrUser(photo.getId()));
+							userName = JsonObject.getJSONObject("photo")
+									.getJSONObject("owner")
+									.getString("username");
+							userLocation = JsonObject.getJSONObject("photo")
+									.getJSONObject("owner")
+									.getString("location");
+							date = JsonObject.getJSONObject("photo")
+									.getJSONObject("dates").getString("taken");
+							viewCount = JsonObject.getJSONObject("photo")
+									.getString("views");
+							iconFarm = JsonObject.getJSONObject("photo")
+									.getJSONObject("owner")
+									.getString("iconfarm");
+							server = JsonObject.getJSONObject("photo")
+									.getJSONObject("owner")
+									.getString("iconserver");
+							nsid = JsonObject.getJSONObject("photo")
+									.getJSONObject("owner").getString("nsid");
+							final Bitmap avatar = getAvatar(iconFarm, server,
+									nsid);
+							final String a = userName, b = userLocation, c = date, d = viewCount;
+							m_handler.post(new Runnable() {
 								@Override
-								public void run() 
-								{
-//									view.setImageBitmap(bm);
-									
+								public void run() {
+									// view.setImageBitmap(bm);
+
 									adapter.addPhoto(photo);
 									adapter.addBitmap(bm);
 									adapter.addAvatar(avatar);
@@ -227,12 +260,11 @@ public class MainActivity extends Activity {
 									adapter.addUserLocation(b);
 									adapter.addPhotoDate(c);
 									adapter.addViewCount(d);
-									adapter.notifyDataSetChanged();									
+									adapter.notifyDataSetChanged();
 									Log.d("Load Image", "loaded");
 								}
 							});
-						} catch (final IOException e) 
-						{
+						} catch (final IOException e) {
 							e.printStackTrace();
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
@@ -249,36 +281,37 @@ public class MainActivity extends Activity {
 		t.start();
 	}
 
-	public void continueSearch(final String string)
-	{
+	public void continueSearch(final String string) {
 		page++;
 		search(string);
 	}
-	public void newSearch(final String string)
-	{
+
+	public void newSearch(final String string) {
 		adapter.clearSearchData();
 		adapter.notifyDataSetChanged();
 		page = 1;
 		search(string);
 	}
+
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) 
-	{
+	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-//------------------------------------
-//	String FlickrQuery_url1 = "http://api.flickr.com/services/rest/?method=flickr.people.getinfo";
+
+	// ------------------------------------
+	// String FlickrQuery_url1 =
+	// "http://api.flickr.com/services/rest/?method=flickr.people.getinfo";
 	String FlickrQuery_url1 = "http://api.flickr.com/services/rest/?method=flickr.photos.getinfo";
-//	String FlickrQuery_user = "&user_id=";
+	// String FlickrQuery_user = "&user_id=";
 	String FlickrQuery_photo = "&photo_id=";
 	String FlickrQuery_nojsoncallback = "&nojsoncallback=1";
 	String FlickrQuery_format = "&format=json";
 	String FlickrApiKey = "2cb46fe99c9874b4ac741ce4a74e351c";
 	String FlickrQuery_key = "&api_key=";
-	private String QueryFlickrUser(String photoID) 
-	{
+
+	private String QueryFlickrUser(String photoID) {
 
 		String qResult = null;
 
@@ -290,8 +323,7 @@ public class MainActivity extends Activity {
 
 		+ FlickrQuery_format
 
-		+ FlickrQuery_key + FlickrApiKey
-		+ FlickrQuery_photo + photoID;
+		+ FlickrQuery_key + FlickrApiKey + FlickrQuery_photo + photoID;
 
 		HttpClient httpClient = new DefaultHttpClient();
 
@@ -341,38 +373,33 @@ public class MainActivity extends Activity {
 
 	}
 
-	public Bitmap getAvatar( String iconFarm, String Server, String nsid)
-	{
-		Bitmap bm= null;
-	    
-	    String FlickrPhotoPath =
-	        "http://farm" + iconFarm + ".static.flickr.com/"
-	        + Server + "/buddyicons/" + nsid + ".jpg";
-	    
-	    URL FlickrPhotoUrl = null;
-	    
-	    try 
-	    {
-	    FlickrPhotoUrl = new URL(FlickrPhotoPath);
-	  
-	    HttpURLConnection httpConnection
-	       = (HttpURLConnection) FlickrPhotoUrl.openConnection();
-	    httpConnection.setDoInput(true);
-	    httpConnection.connect();
-	    InputStream inputStream = httpConnection.getInputStream();
-	    bm = BitmapFactory.decodeStream(inputStream);
-	  
-	   
-	    } catch (MalformedURLException e)
-	    {
-	    	e.printStackTrace();
-	    } catch (IOException e) 
-	    {
-	    
-	    	e.printStackTrace();
-	    }
-	    
-	    return bm;
-	  
+	public Bitmap getAvatar(String iconFarm, String Server, String nsid) {
+		Bitmap bm = null;
+
+		String FlickrPhotoPath = "http://farm" + iconFarm
+				+ ".static.flickr.com/" + Server + "/buddyicons/" + nsid
+				+ ".jpg";
+
+		URL FlickrPhotoUrl = null;
+
+		try {
+			FlickrPhotoUrl = new URL(FlickrPhotoPath);
+
+			HttpURLConnection httpConnection = (HttpURLConnection) FlickrPhotoUrl
+					.openConnection();
+			httpConnection.setDoInput(true);
+			httpConnection.connect();
+			InputStream inputStream = httpConnection.getInputStream();
+			bm = BitmapFactory.decodeStream(inputStream);
+
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+
+		return bm;
+
 	}
 }
