@@ -28,6 +28,9 @@
         <activity 
             android:name="com.cnc.flickrtest.ShowDetailActivity" >
         </activity>
+        <activity 
+            android:name="com.cnc.flickrtest.InfoActivity" >
+        </activity>
     </application>
 
 </manifest>

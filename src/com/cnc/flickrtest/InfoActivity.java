@@ -17,23 +17,62 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
 
 public class InfoActivity extends Activity implements OnTouchListener {
 	private Photo photo;
-	private ImageView view;
+	private Bitmap image, avatar;
+	private String userNameString, userLocationString,
+					dateUpedString, viewCountString,
+					descriptionString;
+	private ImageView view, avatarView;
+	private TextView userName, userLocation, dateUped, viewCount,
+						description;
 	private Handler m_handler;
-
+	private ListView commentListView;
+	private CommentListAdapter commentAdapter;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.detail_layout);
+		setContentView(R.layout.infor_layout);
 		Bundle bundle = getIntent().getExtras();
 		this.photo = (Photo) bundle.get("photo");
-		view = (ImageView) findViewById(R.id.detailImage);
+		this.image = (Bitmap) bundle.get("image");
+		this.avatar = (Bitmap) bundle.get("avatar");
+		this.userNameString = (String) bundle.get("username");
+		this.userLocationString = (String) bundle.get("userlocation");
+		this.dateUpedString = (String) bundle.get("dateuped");
+		this.viewCountString = (String) bundle.get("viewcount");
+		this.descriptionString = (String) bundle.get("description");
+		view = (ImageView) findViewById(R.id.image_info);
+		view.setImageBitmap(image);
 		view.setScaleType(ImageView.ScaleType.FIT_CENTER);
 		view.setOnTouchListener(this);
-		m_handler = new Handler();
-		loadImage();
+		
+		avatarView = (ImageView) findViewById(R.id.avatar_info);
+		avatarView.setImageBitmap(avatar);
+		
+		userName = (TextView) findViewById(R.id.userName_info);
+		userName.setText(userNameString);
+		
+		userLocation = (TextView) findViewById(R.id.userLocation_info);
+		userLocation.setText(userLocationString);
+		
+		dateUped = (TextView) findViewById(R.id.dateUped_info);
+		dateUped.setText(dateUpedString);
+		
+		viewCount = (TextView) findViewById(R.id.viewCount_info);
+		viewCount.setText(viewCountString);
+		
+		description = (TextView ) findViewById(R.id.description_info);
+		description.setText(descriptionString);
+		
+//		commentAdapter = new CommentListAdapter(this);
+//		commentListView = (ListView) findViewById(R.id.listView1_info);
+//		
+//		m_handler = new Handler();
+//		loadImage();
 	}
 
 	public void loadImage() {

@@ -88,6 +88,7 @@ public class ImageListAdapter extends BaseAdapter
 	private List<String> userLocation;
 	private List<String>   photoDate;
 	private List<String>   views;
+	private List<String>   descriptions;
 	public ImageListAdapter(Context context) 
 	{	
 		this.context	= context;
@@ -98,6 +99,7 @@ public class ImageListAdapter extends BaseAdapter
 		userLocation	= new ArrayList<String>();
 		photoDate		= new ArrayList<String>();
 		views			= new ArrayList<String>();
+		descriptions	= new ArrayList<String>();
 
 	}
 
@@ -129,11 +131,42 @@ public class ImageListAdapter extends BaseAdapter
 	{
 		views.add(viewCount);
 	}
+	public void addDescription(String description)
+	{
+		descriptions.add(description);
+	}
 	public Photo getPhoto(int position)
 	{
 		return photoes.get(position);
 	}
-	
+	public Bitmap getImage(int position)
+	{
+		return bitmaps.get(position);
+	}
+	public Bitmap getAvatar(int position)
+	{
+		return avatar.get(position);
+	}
+	public String getUserName( int position )
+	{
+		return usernames.get(position);
+	}
+	public String getUserLocation( int position )
+	{
+		return userLocation.get(position);
+	}
+	public String getDateUped( int position )
+	{
+		return photoDate.get(position);
+	}
+	public String getViewCount( int position )
+	{
+		return views.get(position);
+	}
+	public String getDescription( int position )
+	{
+		return descriptions.get(position);
+	}
 	public void clearSearchData()
 	{
 		photoes.clear();

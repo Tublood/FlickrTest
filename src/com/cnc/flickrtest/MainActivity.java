@@ -105,13 +105,29 @@ public class MainActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
-				Photo photo = adapter.getPhoto(arg2);
+				
 				// Intent t = new Intent( MainActivity.this,
 				// ShowDetailActivity.class );
-				// t.putExtra( "photo", photo);
+				
 				// startActivity(t);
-				Intent t = new Intent(MainActivity.this, ShowDetailActivity.class);
-				t.putExtra("photo", photo);
+				Photo photo = adapter.getPhoto(arg2);
+				Bitmap image = adapter.getImage(arg2);
+				Bitmap avatar = adapter.getAvatar(arg2);
+				String userName = adapter.getUserName(arg2);
+				String userLocation = adapter.getUserLocation(arg2);
+				String dateUped = adapter.getDateUped(arg2);
+				String viewCount = adapter.getViewCount(arg2);
+				String description = adapter.getDescription(arg2);
+				Intent t = new Intent(MainActivity.this, InfoActivity.class);
+//				t.putExtra("photo", photo);
+				t.putExtra("image", image);
+				t.putExtra("avatar", avatar);
+				t.putExtra("username", userName);
+				t.putExtra("userlocation", userLocation);
+				t.putExtra("dateuped", dateUped);
+				t.putExtra("viewcount", viewCount);
+				t.putExtra( "photo", photo);
+				t.putExtra( "description", description);
 				startActivity(t);
 				// MainActivity.this.finish();
 			}
@@ -224,7 +240,10 @@ public class MainActivity extends Activity {
 									.getContent();
 							final Bitmap bm = BitmapFactory.decodeStream(is);
 							// Load user information
-							String userName = null, userLocation = null, date = null, viewCount = null, iconFarm, server, nsid;
+							String userName = null, userLocation = null,
+									date = null, viewCount = null,
+									iconFarm, server, nsid,
+									description = null;
 							JSONObject JsonObject = new JSONObject(
 									QueryFlickrUser(photo.getId()));
 							userName = JsonObject.getJSONObject("photo")
@@ -245,9 +264,12 @@ public class MainActivity extends Activity {
 									.getString("iconserver");
 							nsid = JsonObject.getJSONObject("photo")
 									.getJSONObject("owner").getString("nsid");
+							description = JsonObject.getJSONObject("photo")
+									.getJSONObject("description").getString("_content");
 							final Bitmap avatar = getAvatar(iconFarm, server,
 									nsid);
-							final String a = userName, b = userLocation, c = date, d = viewCount;
+							final String a = userName, b = userLocation,
+									c = date, d = viewCount, e = description;
 							m_handler.post(new Runnable() {
 								@Override
 								public void run() {
@@ -260,6 +282,7 @@ public class MainActivity extends Activity {
 									adapter.addUserLocation(b);
 									adapter.addPhotoDate(c);
 									adapter.addViewCount(d);
+									adapter.addDescription(e);
 									adapter.notifyDataSetChanged();
 									Log.d("Load Image", "loaded");
 								}
