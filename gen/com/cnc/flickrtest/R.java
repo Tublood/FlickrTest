@@ -34,11 +34,11 @@ public final class R {
         public static final int comment_userName=0x7f080005;
         public static final int dateUped=0x7f080014;
         public static final int dateUped_info=0x7f08000c;
-        public static final int description_info=0x7f08000d;
         public static final int detailImage=0x7f080007;
         public static final int editText1=0x7f080000;
         public static final int imageView1=0x7f080002;
-        public static final int image_info=0x7f08000e;
+        public static final int image_info=0x7f08000d;
+        public static final int listView_info=0x7f08000e;
         public static final int listview=0x7f080003;
         public static final int pic=0x7f08000f;
         public static final int userLocation=0x7f080012;

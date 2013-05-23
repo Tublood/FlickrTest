@@ -49,6 +49,11 @@ public class CommentListAdapter extends BaseAdapter
 		usernames.add(name);
 	}
 
+	public void addComment( String comment )
+	{
+		this.comment.add(comment);
+	}
+	
 	public Bitmap getAvatar(int position)
 	{
 		return avatar.get(position);

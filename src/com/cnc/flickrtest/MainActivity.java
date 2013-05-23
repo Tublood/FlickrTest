@@ -71,7 +71,8 @@ public class MainActivity extends Activity {
 	public static ImageManager imageManager;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState) 
+	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		normalImageManagerSettings();
@@ -81,18 +82,22 @@ public class MainActivity extends Activity {
 		listview = (ListView) findViewById(R.id.listview);
 		adapter = new ImageListAdapter(this);
 		listview.setAdapter(adapter);
-		listview.setOnScrollListener(new ListView.OnScrollListener() {
+		listview.setOnScrollListener(new ListView.OnScrollListener() 
+		{
 			@Override
-			public void onScrollStateChanged(AbsListView arg0, int arg1) {
+			public void onScrollStateChanged(AbsListView arg0, int arg1) 
+			{
 			}
 
 			@Override
-			public void onScroll(AbsListView arg0, int arg1, int arg2, int arg3) {
+			public void onScroll(AbsListView arg0, int arg1, int arg2, int arg3) 
+			{
 				// arg1 = firstVisibleItem
 				// arg2 = visibleItemCount
 				// arg3 = totalItemCount
 				int loadedItems = arg1 + arg2;
-				if ((loadedItems == arg3) && !isLoading) {
+				if ((loadedItems == arg3) && !isLoading) 
+				{
 					isLoading = true;
 					continueSearch(editText.getText().toString());
 				}
@@ -100,11 +105,13 @@ public class MainActivity extends Activity {
 
 		});
 
-		listview.setOnItemClickListener(new OnItemClickListener() {
+		listview.setOnItemClickListener(new OnItemClickListener() 
+		{
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
+					long arg3) 
+			{
 				
 				// Intent t = new Intent( MainActivity.this,
 				// ShowDetailActivity.class );
@@ -133,9 +140,11 @@ public class MainActivity extends Activity {
 			}
 
 		});
-		button.setOnClickListener(new Button.OnClickListener() {
+		button.setOnClickListener(new Button.OnClickListener() 
+		{
 			@Override
-			public void onClick(View arg0) {
+			public void onClick(View arg0) 
+			{
 				newSearch(editText.getText().toString());
 				// search(editText.getText().toString());
 			}
@@ -143,13 +152,15 @@ public class MainActivity extends Activity {
 
 	}
 
-	private void normalImageManagerSettings() {
+	private void normalImageManagerSettings() 
+	{
 		imageManager = new ImageManager(this, new SettingsBuilder()
 				.withCacheManager(new LruBitmapCache(this)).build(this));
 	}
 
 	@SuppressWarnings("unused")
-	private void verboseImageManagerSettings() {
+	private void verboseImageManagerSettings() 
+	{
 		SettingsBuilder settingsBuilder = new SettingsBuilder();
 
 		// You can force the urlConnection to disconnect after every call.
@@ -179,63 +190,69 @@ public class MainActivity extends Activity {
 		imageManager = new ImageManager(this, loaderSettings);
 	}
 
-	public static ImageManager getImageLoader() {
+	public static ImageManager getImageLoader() 
+	{
 		return imageManager;
 	}
 
-	public void search(final String string) {
-		Thread t = new Thread() {
-			public void run() {
+	public void search(final String string) 
+	{
+		Thread t = new Thread() 
+		{
+			public void run()
+			{
 				String key = "2cb46fe99c9874b4ac741ce4a74e351c";
 				String svr = "www.flickr.com";
 
 				REST rest = null;
-				try {
+				try 
+				{
 					rest = new REST();
 					rest.setHost(svr);
-				} catch (ParserConfigurationException e) {
+				} catch (ParserConfigurationException e) 
+				{
 					e.printStackTrace();
 				}
-
 				// initialize Flickr object with key and rest
 				Flickr flickr = new Flickr(key, rest);
-
 				// initialize SearchParameter object, this object stores the
 				// search keyword
 				SearchParameters searchParams = new SearchParameters();
 				searchParams.setSort(SearchParameters.RELEVANCE);
-
 				// Create tag keyword array
 				String[] tags = new String[] { string };
 				searchParams.setTags(tags);
-
 				// Initialize PhotosInterface object
 				PhotosInterface photosInterface = flickr.getPhotosInterface();
 				// Execute search with entered tags
 				PhotoList photoList = null;
 				try {
 					photoList = photosInterface.search(searchParams, 10, page);
-				} catch (IOException e) {
+				} catch (IOException e) 
+				{
 					e.printStackTrace();
-				} catch (FlickrException e) {
+				} catch (FlickrException e) 
+				{
 					e.printStackTrace();
-				} catch (JSONException e) {
+				} catch (JSONException e) 
+				{
 					e.printStackTrace();
 				}
-
 				// get search result and fetch the photo object and get small
 				// square imag's url
-				if (photoList != null) {
+				if (photoList != null) 
+				{
 					// Get search result and check the size of photo result
-					for (int i = 0; i < photoList.size(); i++) {
+					for (int i = 0; i < photoList.size(); i++) 
+					{
 						// get photo object
 						final Photo photo = (Photo) photoList.get(i);
 						Log.d("pic:" + String.valueOf(i), photo.getTitle());
 						Log.d("id:" + String.valueOf(i), photo.getId());
-
 						// Load image
 						final String url = photoList.get(i).getSmallUrl();
-						try {
+						try 
+						{
 							final InputStream is = (InputStream) new URL(url)
 									.getContent();
 							final Bitmap bm = BitmapFactory.decodeStream(is);
@@ -270,11 +287,11 @@ public class MainActivity extends Activity {
 									nsid);
 							final String a = userName, b = userLocation,
 									c = date, d = viewCount, e = description;
-							m_handler.post(new Runnable() {
+							m_handler.post(new Runnable() 
+							{
 								@Override
-								public void run() {
-									// view.setImageBitmap(bm);
-
+								public void run() 
+								{
 									adapter.addPhoto(photo);
 									adapter.addBitmap(bm);
 									adapter.addAvatar(avatar);
@@ -287,29 +304,30 @@ public class MainActivity extends Activity {
 									Log.d("Load Image", "loaded");
 								}
 							});
-						} catch (final IOException e) {
+						} catch (final IOException e) 
+						{
 							e.printStackTrace();
-						} catch (JSONException e) {
-							// TODO Auto-generated catch block
+						} catch (JSONException e) 
+						{
 							e.printStackTrace();
 						}
 					}
 					isLoading = false;
-
 				}
-
 			};
 		};
 
 		t.start();
 	}
 
-	public void continueSearch(final String string) {
+	public void continueSearch(final String string) 
+	{
 		page++;
 		search(string);
 	}
 
-	public void newSearch(final String string) {
+	public void newSearch(final String string) 
+	{
 		adapter.clearSearchData();
 		adapter.notifyDataSetChanged();
 		page = 1;
@@ -317,7 +335,8 @@ public class MainActivity extends Activity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onCreateOptionsMenu(Menu menu) 
+	{
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
@@ -334,78 +353,52 @@ public class MainActivity extends Activity {
 	String FlickrApiKey = "2cb46fe99c9874b4ac741ce4a74e351c";
 	String FlickrQuery_key = "&api_key=";
 
-	private String QueryFlickrUser(String photoID) {
-
+	private String QueryFlickrUser(String photoID) 
+	{
 		String qResult = null;
-
 		String qString =
-
 		FlickrQuery_url1
-
 		+ FlickrQuery_nojsoncallback
-
 		+ FlickrQuery_format
-
 		+ FlickrQuery_key + FlickrApiKey + FlickrQuery_photo + photoID;
-
 		HttpClient httpClient = new DefaultHttpClient();
-
 		HttpGet httpGet = new HttpGet(qString);
-
-		try {
-
+		try 
+		{
 			HttpEntity httpEntity = httpClient.execute(httpGet).getEntity();
-
-			if (httpEntity != null) {
-
+			if (httpEntity != null) 
+			{
 				InputStream inputStream = httpEntity.getContent();
-
 				Reader in = new InputStreamReader(inputStream);
-
 				BufferedReader bufferedreader = new BufferedReader(in);
-
 				StringBuilder stringBuilder = new StringBuilder();
-
 				String stringReadLine = null;
-
-				while ((stringReadLine = bufferedreader.readLine()) != null) {
-
+				while ((stringReadLine = bufferedreader.readLine()) != null) 
+				{
 					stringBuilder.append(stringReadLine + "\n");
-
 				}
-
 				qResult = stringBuilder.toString();
-
 			}
 
-		} catch (ClientProtocolException e) {
-
-			// TODO Auto-generated catch block
-
+		} catch (ClientProtocolException e) 
+		{
 			e.printStackTrace();
-
-		} catch (IOException e) {
-
-			// TODO Auto-generated catch block
-
+		} catch (IOException e)
+		{
 			e.printStackTrace();
-
 		}
-
 		return qResult;
-
 	}
 
-	public Bitmap getAvatar(String iconFarm, String Server, String nsid) {
+	public Bitmap getAvatar(String iconFarm, String Server, String nsid) 
+	{
 		Bitmap bm = null;
-
 		String FlickrPhotoPath = "http://farm" + iconFarm
 				+ ".static.flickr.com/" + Server + "/buddyicons/" + nsid
 				+ ".jpg";
-
 		URL FlickrPhotoUrl = null;
-
-		try {
+		try 
+		{
 			FlickrPhotoUrl = new URL(FlickrPhotoPath);
 
 			HttpURLConnection httpConnection = (HttpURLConnection) FlickrPhotoUrl
@@ -415,14 +408,13 @@ public class MainActivity extends Activity {
 			InputStream inputStream = httpConnection.getInputStream();
 			bm = BitmapFactory.decodeStream(inputStream);
 
-		} catch (MalformedURLException e) {
+		} catch (MalformedURLException e)
+		{
 			e.printStackTrace();
-		} catch (IOException e) {
-
+		} catch (IOException e) 
+		{
 			e.printStackTrace();
 		}
-
 		return bm;
-
 	}
 }
