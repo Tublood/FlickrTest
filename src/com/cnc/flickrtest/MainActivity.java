@@ -65,7 +65,7 @@ public class MainActivity extends Activity {
 	private EditText editText;
 	private ListView listview;
 	private boolean isLoading;
-
+	private FlickrContainer fc;
 	private ImageListAdapter adapter;
 	
 	public static ImageManager imageManager;
@@ -76,6 +76,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		normalImageManagerSettings();
+		fc = FlickrContainer.getInstance();
 		button = (Button) findViewById(R.id.button1);
 		editText = (EditText) findViewById(R.id.editText1);
 		view = (ImageView) findViewById(R.id.imageView1);
@@ -117,24 +118,25 @@ public class MainActivity extends Activity {
 				// ShowDetailActivity.class );
 				
 				// startActivity(t);
-				Photo photo = adapter.getPhoto(arg2);
-				Bitmap image = adapter.getImage(arg2);
-				Bitmap avatar = adapter.getAvatar(arg2);
-				String userName = adapter.getUserName(arg2);
-				String userLocation = adapter.getUserLocation(arg2);
-				String dateUped = adapter.getDateUped(arg2);
-				String viewCount = adapter.getViewCount(arg2);
-				String description = adapter.getDescription(arg2);
+//				Photo photo = adapter.getPhoto(arg2);
+//				Bitmap image = adapter.getImage(arg2);
+//				Bitmap avatar = adapter.getAvatar(arg2);
+//				String userName = adapter.getUserName(arg2);
+//				String userLocation = adapter.getUserLocation(arg2);
+//				String dateUped = adapter.getDateUped(arg2);
+//				String viewCount = adapter.getViewCount(arg2);
+//				String description = adapter.getDescription(arg2);
 				Intent t = new Intent(MainActivity.this, InfoActivity.class);
+				t.putExtra("position", arg2);
 //				t.putExtra("photo", photo);
-				t.putExtra("image", image);
-				t.putExtra("avatar", avatar);
-				t.putExtra("username", userName);
-				t.putExtra("userlocation", userLocation);
-				t.putExtra("dateuped", dateUped);
-				t.putExtra("viewcount", viewCount);
-				t.putExtra( "photo", photo);
-				t.putExtra( "description", description);
+//				t.putExtra("image", image);
+//				t.putExtra("avatar", avatar);
+//				t.putExtra("username", userName);
+//				t.putExtra("userlocation", userLocation);
+//				t.putExtra("dateuped", dateUped);
+//				t.putExtra("viewcount", viewCount);
+//				t.putExtra( "photo", photo);
+//				t.putExtra( "description", description);
 				startActivity(t);
 				// MainActivity.this.finish();
 			}
@@ -257,51 +259,60 @@ public class MainActivity extends Activity {
 									.getContent();
 							final Bitmap bm = BitmapFactory.decodeStream(is);
 							// Load user information
-							String userName = null, userLocation = null,
-									date = null, viewCount = null,
-									iconFarm, server, nsid,
-									description = null;
+
 							JSONObject JsonObject = new JSONObject(
 									QueryFlickrUser(photo.getId()));
-							userName = JsonObject.getJSONObject("photo")
+							final String userName = JsonObject.getJSONObject("photo")
 									.getJSONObject("owner")
 									.getString("username");
-							userLocation = JsonObject.getJSONObject("photo")
+							final String userLocation = JsonObject.getJSONObject("photo")
 									.getJSONObject("owner")
 									.getString("location");
-							date = JsonObject.getJSONObject("photo")
+							final String date = JsonObject.getJSONObject("photo")
 									.getJSONObject("dates").getString("taken");
-							viewCount = JsonObject.getJSONObject("photo")
+							final String viewCount = JsonObject.getJSONObject("photo")
 									.getString("views");
-							iconFarm = JsonObject.getJSONObject("photo")
+							final String iconFarm = JsonObject.getJSONObject("photo")
 									.getJSONObject("owner")
 									.getString("iconfarm");
-							server = JsonObject.getJSONObject("photo")
+							final String server = JsonObject.getJSONObject("photo")
 									.getJSONObject("owner")
 									.getString("iconserver");
-							nsid = JsonObject.getJSONObject("photo")
+							final String nsid = JsonObject.getJSONObject("photo")
 									.getJSONObject("owner").getString("nsid");
-							description = JsonObject.getJSONObject("photo")
+							final String description = JsonObject.getJSONObject("photo")
 									.getJSONObject("description").getString("_content");
 							final Bitmap avatar = getAvatar(iconFarm, server,
 									nsid);
-							final String a = userName, b = userLocation,
-									c = date, d = viewCount, e = description;
+//							final String a = userName, b = userLocation,
+//									c = date, d = viewCount, e = description;
 							m_handler.post(new Runnable() 
 							{
 								@Override
 								public void run() 
 								{
+									//add to adapter
 									adapter.addPhoto(photo);
 									adapter.addBitmap(bm);
 									adapter.addAvatar(avatar);
-									adapter.addUserName(a);
-									adapter.addUserLocation(b);
-									adapter.addPhotoDate(c);
-									adapter.addViewCount(d);
-									adapter.addDescription(e);
+									adapter.addUserName(userName);
+									adapter.addUserLocation(userLocation);
+									adapter.addPhotoDate(date);
+									adapter.addViewCount(viewCount);
+									adapter.addDescription(description);
 									adapter.notifyDataSetChanged();
 									Log.d("Load Image", "loaded");
+									//add to flick container
+									fc.addPhoto(photo);
+									fc.addBitmap(bm);
+									fc.addAvatar(avatar);
+									fc.addUserName(userName);
+									fc.addUserLocation(userLocation);
+									fc.addViewCount(viewCount);
+									fc.addDateUped(date);
+									fc.addUserID(nsid);
+									fc.addUserFarm(iconFarm);
+									fc.addUserServer(server);
 								}
 							});
 						} catch (final IOException e) 

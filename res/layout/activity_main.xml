@@ -12,8 +12,9 @@
         android:id="@+id/editText1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="26dp"
-       
+        android:layout_alignLeft="@+id/listview"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/button1"
         android:ems="10"
         android:hint="@string/image" >
 
@@ -26,6 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/editText1"
         android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
         android:text="@string/search" />
 
     <ImageView
@@ -45,4 +47,5 @@
         android:layout_below="@+id/editText1" >
         
     </ListView>
+
 </RelativeLayout>
