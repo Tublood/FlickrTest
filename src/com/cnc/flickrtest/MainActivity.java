@@ -1,8 +1,6 @@
 package com.cnc.flickrtest;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,7 +8,6 @@ import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,17 +36,10 @@ import com.novoda.imageloader.core.LoaderSettings;
 import com.novoda.imageloader.core.LoaderSettings.SettingsBuilder;
 import com.novoda.imageloader.core.cache.LruBitmapCache;
 
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
 import android.app.Activity;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -63,8 +53,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -73,16 +61,14 @@ public class MainActivity extends Activity {
 	private List<Bitmap> bitmaps = new ArrayList<Bitmap>();
 	private int page = 1;
 	private ImageView view;
-	private Button button, save_image;
+	private Button button;
 	private EditText editText;
 	private ListView listview;
 	private boolean isLoading;
 	private FlickrContainer fc;
 	private ImageListAdapter adapter;
-	
 
 	public static ImageManager imageManager;
-	private MyDatabase database = new MyDatabase(this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -91,10 +77,8 @@ public class MainActivity extends Activity {
 		normalImageManagerSettings();
 		fc = FlickrContainer.getInstance();
 		button = (Button) findViewById(R.id.button1);
-		
 		editText = (EditText) findViewById(R.id.editText1);
 		view = (ImageView) findViewById(R.id.imageView1);
-		save_image = (Button)findViewById(R.id.save_image);
 		listview = (ListView) findViewById(R.id.listview);
 		adapter = new ImageListAdapter(this);
 		listview.setAdapter(adapter);
@@ -158,26 +142,6 @@ public class MainActivity extends Activity {
 				// search(editText.getText().toString());
 			}
 		});
-//		save_image.setOnClickListener(new Button.OnClickListener() {
-//
-//			@Override
-//			public void onClick(View arg0) {
-//				// TODO Auto-generated method stub
-//				try {
-//					database.open();
-//				} catch (SQLException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//				
-//				String userName = null;
-//				String loc = null;
-//				database.createData(userName, loc);
-//				database.close();
-//				Log.d(null, "suceess");
-//			}
-//
-//		});
 
 	}
 
@@ -430,83 +394,4 @@ public class MainActivity extends Activity {
 		}
 		return bm;
 	}
-	
-	// data processs
-//	private String selectedImagePath;
-//	String DB_NAME = Environment.getExternalStorageDirectory() + "/im.db";
-//    String TABLE_NAME = "mytable";
-//    private static final int SELECT_PICTURE = 1;
-    
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        if (resultCode == RESULT_OK) {
-//            if (requestCode == SELECT_PICTURE) {
-//                Uri selectedImageUri = data.getData();
-//                selectedImagePath = getPath(selectedImageUri);
-//                System.out.println("Image Path : " + selectedImagePath);
-//                adapter = new ImageListAdapter(this);
-//                listview.setVisibility(View.VISIBLE);
-//                listview.setAdapter(adapter);
-//                (adapter).setImageURI(selectedImageUri);
-//            }
-//        }
-//    }
-
-//	private String getPath(Uri uri) {
-//		String[] projection = { MediaStore.Images.Media.DATA };
-//		Cursor cursor = managedQuery(uri, projection, null, null, null);
-//        int column_index = cursor
-//                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-//        cursor.moveToFirst();
-//        return cursor.getString(column_index);
-//	}
-//	
-//	// create table
-//	 void createTable() {
-//	        SQLiteDatabase myDb = openOrCreateDatabase(DB_NAME,
-//	                Context.MODE_PRIVATE, null);
-//	        String MySQL = "create table if not exists "
-//	                + TABLE_NAME
-//	                + " (_id INTEGER primary key autoincrement, name TEXT not null, image BLOB);";
-//	        myDb.execSQL(MySQL);
-//	        myDb.close();
-//	    }
-//	 // save data
-//	 void saveInDB() {
-//	        SQLiteDatabase myDb = openOrCreateDatabase(DB_NAME,
-//	                Context.MODE_PRIVATE, null);
-//	        byte[] byteImage1 = null;
-//	        String s = myDb.getPath();
-//	 
-//	        myDb.execSQL("delete from " + TABLE_NAME);          // clearing the table
-//	        ContentValues newValues = new ContentValues();
-//	        String name = "thientv";
-//	        newValues.put("name", name);
-//	        TextView textView = null;
-//			try {
-//	            FileInputStream instream = new FileInputStream(selectedImagePath);
-//	            BufferedInputStream bif = new BufferedInputStream(instream);
-//	            byteImage1 = new byte[bif.available()];
-//	            bif.read(byteImage1);
-//	            newValues.put("image", byteImage1);
-//	            long ret = myDb.insert(TABLE_NAME, null, newValues);
-//	            if (ret < 0)
-//	                textView.append("Error");
-//	        } catch (IOException e) {
-//	            textView.append("Error Exception : " + e.getMessage());
-//	        }
-//	        myDb.close();
-//	        textView.append("\n Saving Details \n Name : " + name);
-//	        textView.append("\n Image Size : " + byteImage1.length + " KB");
-//	        textView.append("\n Saved in DB : " + s + "\n");
-//	        Toast.makeText(this.getBaseContext(),
-//	                "Image Saved in DB successfully.", Toast.LENGTH_SHORT).show();
-//	    }
-//	 
-//	 void setImage(byte[] byteImage2) {
-//	        image2.setImageBitmap(BitmapFactory.decodeByteArray(byteImage2, 0,
-//	                byteImage2.length));
-//	        textView.append("\n Image Size : " + byteImage2.length + " KB");
-//	    }
-    
-	
 }

@@ -20,15 +20,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.googlecode.flickrjandroid.photos.Photo;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
-
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -45,15 +42,16 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.googlecode.flickrjandroid.photos.Photo;
 
 public class InfoActivity extends Activity implements OnTouchListener,
 		OnClickListener {
@@ -63,31 +61,25 @@ public class InfoActivity extends Activity implements OnTouchListener,
 			viewCountString;
 
 	private ImageView view, avatarView;
-	private TextView userName, userLocation, dateUped, viewCount;
+	private TextView userName, userLocation, dateUped, viewCount,textView;
 	private WebView webview;
 	private Handler m_handler = new Handler();
 	private ListView commentListView;
 	private String photoID;
 	private CommentListAdapter commentAdapter;
-	public FlickrContainer fc;
 	private Button save_image;
+	public FlickrContainer fc;
 	ViewPager pager;
 
+	// private MyDatabase database = new MyDatabase(this);
+
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		fc = FlickrContainer.getInstance();
 		setContentView(R.layout.infor_layout);
 		Bundle bundle = getIntent().getExtras();
 		int position = bundle.getInt("position");
-		// this.photo = (Photo) bundle.get("photo");
-		// this.photoID = photo.getId();
-		// this.image = (Bitmap) bundle.get("image");
-		// this.avatar = (Bitmap) bundle.get("avatar");
-		// this.userNameString = (String) bundle.get("username");
-		// this.userLocationString = (String) bundle.get("userlocation");
-		// this.dateUpedString = (String) bundle.get("dateuped");
-		// this.viewCountString = (String) bundle.get("viewcount");
 		this.photo = fc.getPhoto(position);
 		this.photoID = photo.getId();
 		this.image = fc.getBitmap(position);
@@ -99,6 +91,33 @@ public class InfoActivity extends Activity implements OnTouchListener,
 
 		save_image = (Button) findViewById(R.id.save_image);
 		save_image.setOnClickListener(this);
+		
+		 
+
+		// //save
+		// save_image.setOnClickListener(new OnClickListener() {
+		//
+		// @Override
+		// public void onClick(View v) {
+		// // TODO Auto-generated method stub
+		// try {
+		// database.open();
+		// } catch (SQLException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		//
+		// database.createData(userNameString, userLocationString);
+		//
+		// database.close();
+		// // Context context = getApplicationContext();
+		// // CharSequence text = "Save Successfull";
+		// // int duration = Toast.LENGTH_SHORT;
+		// //
+		// // Toast toast = Toast.makeText(context, text, duration);
+		// // toast.show();
+		// }
+		// });
 
 		view = (ImageView) findViewById(R.id.image_info);
 		view.setImageBitmap(image);
@@ -428,10 +447,24 @@ public class InfoActivity extends Activity implements OnTouchListener,
 
 	}
 
-	// process data
+	@Override
+	public void onClick(View v) {
+		int id = v.getId();
+		switch (id){
+		case R.id.save_image:
+            createTable();
+            saveInDB();
+            break;
+        default :
+        	break;
+		}
+		
+	}
+
+	// database process
 	private String selectedImagePath;
 	private static final int SELECT_PICTURE = 1;
-	String DB_NAME = Environment.getExternalStorageDirectory() + "/im.db";
+	String DB_NAME = Environment.getExternalStorageDirectory() + "/Image.db";
 	String TABLE_NAME = "mytable";
 
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -455,34 +488,36 @@ public class InfoActivity extends Activity implements OnTouchListener,
 		cursor.moveToFirst();
 		return cursor.getString(column_index);
 	}
-
-	void createTable() {
-		SQLiteDatabase myDb = InfoActivity.this.openOrCreateDatabase(DB_NAME,
-				InfoActivity.this.MODE_PRIVATE, null);
+	
+	// tao bang
+	public void createTable() throws SQLException{
+		
+		SQLiteDatabase myDb = openOrCreateDatabase(DB_NAME,
+				SQLiteDatabase.OPEN_READWRITE, null);
 		String MySQL = "create table if not exists "
 				+ TABLE_NAME
 				+ " (_id INTEGER primary key autoincrement, name TEXT not null, image BLOB);";
 		myDb.execSQL(MySQL);
 		myDb.close();
 	}
-
-	void saveInDB() {
-		SQLiteDatabase myDb = InfoActivity.this.openOrCreateDatabase(DB_NAME,
-				InfoActivity.this.MODE_PRIVATE, null);
-		byte[] byteImage1 = null;
+	
+	// insert data
+	public void saveInDB() {
+		SQLiteDatabase myDb = openOrCreateDatabase(DB_NAME,
+				Context.MODE_PRIVATE, null);
+		byte[] byteview= null;
 		String s = myDb.getPath();
 
 		myDb.execSQL("delete from " + TABLE_NAME); // clearing the table
 		ContentValues newValues = new ContentValues();
-
-		newValues.put("name", userNameString);
-		TextView textView = null;
+		String name = "thientv";
+		newValues.put("name", name);
 		try {
 			FileInputStream instream = new FileInputStream(selectedImagePath);
 			BufferedInputStream bif = new BufferedInputStream(instream);
-			byteImage1 = new byte[bif.available()];
-			bif.read(byteImage1);
-			newValues.put("image", byteImage1);
+			byteview= new byte[bif.available()];
+			bif.read(byteview);
+			newValues.put("image", byteview);
 			long ret = myDb.insert(TABLE_NAME, null, newValues);
 			if (ret < 0)
 				textView.append("Error");
@@ -490,52 +525,11 @@ public class InfoActivity extends Activity implements OnTouchListener,
 			textView.append("Error Exception : " + e.getMessage());
 		}
 		myDb.close();
-		textView.append("\n Saving Details \n Name : " + userNameString);
-		textView.append("\n Image Size : " + byteImage1.length + " KB");
+		textView.append("\n Saving Details \n Name : " + name);
+		textView.append("\n Image Size : " + byteview.length + " KB");
 		textView.append("\n Saved in DB : " + s + "\n");
 		Toast.makeText(this.getBaseContext(),
 				"Image Saved in DB successfully.", Toast.LENGTH_SHORT).show();
 	}
-
-	@Override
-	public void onClick(View v) {
-		// TODO Auto-generated method stub
-		Intent intent = new Intent();
-		intent.setType("image/*");
-		intent.setAction(Intent.ACTION_GET_CONTENT);
-		
-		createTable();
-		saveInDB();
-
-	}
-	// void readFromDB() {
-	// byte[] byteImage2 = null;
-	// SQLiteDatabase myDb;
-	// myDb = openOrCreateDatabase(DB_NAME, Context.MODE_PRIVATE, null);
-	// Cursor cur = myDb.query(TABLE_NAME, null, null, null, null, null, null);
-	// cur.moveToFirst();
-	// while (cur.isAfterLast() == false) {
-	// textView.append("\n Reading Details \n Name : " + cur.getString(1));
-	// cur.moveToNext();
-	// }
-	//
-	// // /////Read data from blob field////////////////////
-	// cur.moveToFirst();
-	// byteImage2 = cur.getBlob(cur.getColumnIndex("image"));
-	// setImage(byteImage2);
-	// cur.close();
-	// myDb.close();
-	// Toast.makeText(this.getBaseContext(),
-	// "Image read from DB successfully.", Toast.LENGTH_SHORT).show();
-	// Toast.makeText(this.getBaseContext(),
-	// "If your image is big, please scrolldown to see the result.",
-	// Toast.LENGTH_SHORT).show();
-	// }
-	//
-	// void setImage(byte[] byteImage2) {
-	// image2.setImageBitmap(BitmapFactory.decodeByteArray(byteImage2, 0,
-	// byteImage2.length));
-	// textView.append("\n Image Size : " + byteImage2.length + " KB");
-	// }
 
 }
