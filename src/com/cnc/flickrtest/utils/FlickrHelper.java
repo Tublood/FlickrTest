@@ -14,8 +14,8 @@ import com.googlecode.flickrjandroid.photos.PhotosInterface;
 public final class FlickrHelper {
 
 	private static FlickrHelper instance = null;
-	private static final String API_KEY = "da4fadd0084ea1799ad33048f0d6a5c5"; //$NON-NLS-1$
-	public static final String API_SEC = "186b04791439c326"; //$NON-NLS-1$
+	private static final String API_KEY = "2cb46fe99c9874b4ac741ce4a74e351c"; //$NON-NLS-1$
+	public static final String API_SEC = "9e7551609585cadd"; //$NON-NLS-1$
 
 	private FlickrHelper() {
 

@@ -23,6 +23,7 @@ import org.json.JSONObject;
 
 import com.cnc.flickrtest.R;
 import com.cnc.flickrtest.camera.CameraActivity;
+import com.cnc.flickrtest.upload.UploadActivity;
 import com.cnc.flickrtest.utils.FlickrContainer;
 import com.googlecode.flickrjandroid.Flickr;
 import com.googlecode.flickrjandroid.FlickrException;
@@ -66,7 +67,7 @@ public class MainActivity extends Activity {
 	private List<Bitmap> bitmaps = new ArrayList<Bitmap>();
 	private int page = 1;
 	private ImageView view;
-	private Button button, button2;
+	private Button button, button2, button3;
 	private EditText editText;
 	private ListView listview;
 	private boolean isLoading;
@@ -83,6 +84,7 @@ public class MainActivity extends Activity {
 		fc = FlickrContainer.getInstance();
 		button = (Button) findViewById(R.id.button1);
 		button2  = (Button) findViewById(R.id.button2);
+		button2  = (Button) findViewById(R.id.button3);
 		
 		editText = (EditText) findViewById(R.id.editText1);
 		view = (ImageView) findViewById(R.id.imageView1);
@@ -149,6 +151,17 @@ public class MainActivity extends Activity {
 			}
 		});
 		
+		button2.setOnClickListener(new Button.OnClickListener() 
+		{
+			
+			@Override
+			public void onClick(View arg0) 
+			{				
+				Intent t = new Intent(MainActivity.this, UploadActivity.class);
+				startActivity(t);
+				finish();
+			}
+		});
 
 	}
 

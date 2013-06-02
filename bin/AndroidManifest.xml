@@ -36,6 +36,20 @@
         <activity 
             android:name="com.cnc.flickrtest.camera.CameraActivity" >
         </activity>
+        <activity android:name="com.cnc.flickrtest.upload.UploadActivity" >
+        </activity>
+        <activity
+            android:name="com.cnc.flickrtest.upload.FlickrjActivity"
+            android:launchMode="singleTask" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="flickrj-android-sample-oauth" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
