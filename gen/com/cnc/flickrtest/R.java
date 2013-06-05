@@ -25,9 +25,10 @@ public final class R {
         public static final int index=0x7f020001;
     }
     public static final class id {
-        public static final int action_settings=0x7f080024;
+        public static final int action_settings=0x7f080025;
         public static final int avatar=0x7f080018;
         public static final int avatar_info=0x7f080010;
+        public static final int btnBack=0x7f080022;
         public static final int btnFlickr=0x7f080021;
         public static final int btnPick=0x7f080020;
         public static final int button1=0x7f080004;
@@ -45,7 +46,7 @@ public final class R {
         public static final int editText1=0x7f080002;
         public static final int imageView1=0x7f080005;
         public static final int image_info=0x7f080015;
-        public static final int info_webView=0x7f080023;
+        public static final int info_webView=0x7f080024;
         public static final int listView_info=0x7f080016;
         public static final int listview=0x7f080003;
         public static final int mainLay=0x7f080001;
@@ -55,7 +56,7 @@ public final class R {
         public static final int pager=0x7f080000;
         public static final int pic=0x7f080017;
         public static final int result=0x7f080008;
-        public static final int upImageView=0x7f080022;
+        public static final int upImageView=0x7f080023;
         public static final int userLocation=0x7f08001a;
         public static final int userLocation_info=0x7f080012;
         public static final int userName=0x7f080019;

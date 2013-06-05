@@ -80,11 +80,11 @@ public class MainActivity extends Activity {
 	{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		normalImageManagerSettings();
+//		normalImageManagerSettings();
 		fc = FlickrContainer.getInstance();
 		button = (Button) findViewById(R.id.button1);
 		button2  = (Button) findViewById(R.id.button2);
-		button2  = (Button) findViewById(R.id.button3);
+		button3  = (Button) findViewById(R.id.button3);
 		
 		editText = (EditText) findViewById(R.id.editText1);
 		view = (ImageView) findViewById(R.id.imageView1);
@@ -151,7 +151,7 @@ public class MainActivity extends Activity {
 			}
 		});
 		
-		button2.setOnClickListener(new Button.OnClickListener() 
+		button3.setOnClickListener(new Button.OnClickListener() 
 		{
 			
 			@Override
@@ -165,11 +165,11 @@ public class MainActivity extends Activity {
 
 	}
 
-	private void normalImageManagerSettings() 
-	{
-		imageManager = new ImageManager(this, new SettingsBuilder()
-				.withCacheManager(new LruBitmapCache(this)).build(this));
-	}
+//	private void normalImageManagerSettings() 
+//	{
+//		imageManager = new ImageManager(this, new SettingsBuilder()
+//				.withCacheManager(new LruBitmapCache(this)).build(this));
+//	}
 
 	@SuppressWarnings("unused")
 	private void verboseImageManagerSettings() 

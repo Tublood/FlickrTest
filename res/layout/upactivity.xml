@@ -16,6 +16,12 @@
         android:layout_height="wrap_content"
         android:text="Upload Photo On Flickr" />
 
+    <Button
+        android:id="@+id/btnBack"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Back" />
+
     <ImageView
         android:id="@+id/upImageView"
         android:layout_width="wrap_content"

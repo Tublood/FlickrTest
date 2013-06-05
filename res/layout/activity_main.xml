@@ -53,6 +53,7 @@
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/button1"
         android:layout_alignRight="@+id/imageView1"
         android:layout_alignTop="@+id/imageView1"
         android:text="Take Pic" />
@@ -61,7 +62,8 @@
         android:id="@+id/button3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/imageView1"
+        android:layout_above="@+id/listview"
+        android:layout_below="@+id/editText1"
         android:layout_toLeftOf="@+id/button1"
         android:text="Up Pic" />
 

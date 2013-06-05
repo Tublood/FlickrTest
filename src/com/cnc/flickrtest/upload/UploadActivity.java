@@ -3,6 +3,8 @@ package com.cnc.flickrtest.upload;
 import java.io.File;
 
 import com.cnc.flickrtest.R;
+import com.cnc.flickrtest.camera.CameraActivity;
+import com.cnc.flickrtest.main.MainActivity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -30,6 +32,9 @@ public class UploadActivity extends Activity {
 
 		Button btnPick = (Button) findViewById(R.id.btnPick);
 		btnPick.setOnClickListener(mPickClickListener);
+		
+		Button btnBack = (Button) findViewById(R.id.btnBack);
+		btnBack.setOnClickListener(mBackClickListener);
 
 	}
 
@@ -63,6 +68,17 @@ public class UploadActivity extends Activity {
 		}
 	};
 
+	View.OnClickListener mBackClickListener = new View.OnClickListener() 
+	{
+		
+		@Override
+		public void onClick(View v) 
+		{
+			Intent t = new Intent(UploadActivity.this, MainActivity.class);
+			startActivity(t);
+			finish();			
+		}
+	};
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 
