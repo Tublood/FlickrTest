@@ -1,74 +1,24 @@
 package com.cnc.flickrtest.main;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.cnc.flickrtest.R;
 import com.googlecode.flickrjandroid.photos.Photo;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
+import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-//public class ImageListAdapter extends ArrayAdapter<Photo> 
-//{
-//
-//	private Context 	context;
-//	private List<Photo> photoes;
-//	private List<Bitmap> bitmaps;
-//	public ImageListAdapter(Context context, List<Photo> photoes, List<Bitmap> bitmaps) 
-//	{
-//		super(context, R.layout.list_layout, photoes);
-//		
-//		
-//		this.context	= context;
-//		this.photoes	= photoes;
-//		this.bitmaps	= bitmaps;
-////		photoes			= new ArrayList<Photo>();
-////		bitmaps			= new ArrayList<Bitmap>();
-//
-//	}
-//
-//	public void addPhoto(Photo photo)
-//	{
-//		photoes.add(photo);
-//	}
-//	public void addBitmap(Bitmap bm)
-//	{
-//		bitmaps.add(bm);
-//	}
-//	public Photo getPhoto(int position)
-//	{
-//		return photoes.get(position);
-//	}
-//	public void clearSearchData()
-//	{
-//		photoes.clear();
-//		bitmaps.clear();
-//	}
-//	@Override
-//	public View getView(int position, View convertView, ViewGroup parent) 
-//	{
-//		LayoutInflater inflater = (LayoutInflater) context
-//				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//	 
-//		View rowView 		= inflater.inflate(R.layout.list_layout, parent, false);
-//		TextView textView 	= (TextView) rowView.findViewById(R.id.label);
-//		ImageView imageView = (ImageView) rowView.findViewById(R.id.logo);
-//		imageView.setImageBitmap(bitmaps.get(position));
-//		textView.setText(photoes.get(position).getTitle());
-// 
-//		return rowView;
-//	}
-//}
 public class ImageListAdapter extends BaseAdapter
 {
 
@@ -79,29 +29,46 @@ public class ImageListAdapter extends BaseAdapter
 		public TextView 	dateUped;
 		public TextView 	viewCount;
 		public ImageView 	pic;
-		public ImageView 	avatar;
+		public ImageView 	avatar;		
 	}
-	private Context 	context;
-	private List<Photo> photoes;
-	private List<Bitmap> bitmaps;
-	private List<Bitmap> avatar;
-	private List<String> usernames;
-	private List<String> userLocation;
+	private Context 		context;
+	private List<Photo> 	photoes;
+	private List<Bitmap> 	bitmaps;
+	private List<Bitmap> 	avatar;
+	private List<String> 	usernames;
+	private List<String> 	userLocation;
 	private List<String>   photoDate;
 	private List<String>   views;
 	private List<String>   descriptions;
+	private List<String>	urls;
+	private List<String>	avatarUrls;
+	private ImageLoader		imageLoader;
+	
+	private DisplayImageOptions options;
 	public ImageListAdapter(Context context) 
 	{	
 		this.context	= context;
+		
+		options = new DisplayImageOptions.Builder( ) 
+	        .resetViewBeforeLoading( ) 
+	        .imageScaleType( ImageScaleType.EXACTLY ) 
+	        .bitmapConfig( Bitmap.Config.RGB_565 ) 
+	        .cacheInMemory( ) 
+	        .cacheOnDisc( ) 
+	        .build( );
+		imageLoader		= ImageLoader.getInstance();
+		
 		photoes			= new ArrayList<Photo>();
-		bitmaps			= new ArrayList<Bitmap>();
-		avatar			= new ArrayList<Bitmap>();
+//		bitmaps			= new ArrayList<Bitmap>();
+//		avatar			= new ArrayList<Bitmap>();
 		usernames		= new ArrayList<String>();
 		userLocation	= new ArrayList<String>();
 		photoDate		= new ArrayList<String>();
 		views			= new ArrayList<String>();
 		descriptions	= new ArrayList<String>();
-
+		urls			= new ArrayList<String>();
+		avatarUrls		= new ArrayList<String>();
+		
 	}
 
 	public void addPhoto(Photo photo)
@@ -136,6 +103,14 @@ public class ImageListAdapter extends BaseAdapter
 	{
 		descriptions.add(description);
 	}
+	public void addURL(String url)
+	{
+		urls.add(url);
+	}
+	public void addAvatarURL(String url)
+	{
+		avatarUrls.add(url);
+	}
 	public Photo getPhoto(int position)
 	{
 		return photoes.get(position);
@@ -168,15 +143,25 @@ public class ImageListAdapter extends BaseAdapter
 	{
 		return descriptions.get(position);
 	}
+	public String getURL( int position )
+	{
+		return urls.get(position);
+	}
+	public String getAvatarURL( int position )
+	{
+		return avatarUrls.get(position);
+	}
 	public void clearSearchData()
 	{
 		photoes.clear();
-		bitmaps.clear();
+//		bitmaps.clear();
 		usernames.clear();
 		userLocation.clear();
 		photoDate.clear();
 		views.clear();
-		avatar.clear();
+//		avatar.clear();
+		urls.clear();
+		avatarUrls.clear();
 	}
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) 
@@ -200,20 +185,17 @@ public class ImageListAdapter extends BaseAdapter
 		else
 		{
 			holder =(ViewHolder)convertView.getTag();
+			imageLoader.displayImage( urls.get( position ), holder.pic, options );
+			imageLoader.displayImage( avatarUrls.get( position ), holder.avatar, options );
+//			holder.pic.setImageBitmap(bitmaps.get(position));
+//			holder.avatar.setImageBitmap(avatar.get(position));
+			holder.userName.setText(usernames.get(position));
+			holder.userLocation.setText(userLocation.get(position));
+			holder.dateUped.setText(photoDate.get(position));
+			holder.viewCount.setText(views.get(position));
+			
 		}
-		holder.pic.setImageBitmap(bitmaps.get(position));
-		holder.avatar.setImageBitmap(avatar.get(position));
-		holder.userName.setText(usernames.get(position));
-		holder.userLocation.setText(userLocation.get(position));
-//		holder.userLocation.setText(photoes.get(position).getOwner().getLocation());
-		holder.dateUped.setText(photoDate.get(position));
-		holder.viewCount.setText(views.get(position));
 		
-//		holder.avatar.setImageBitmap(bitmaps.get(position));
-//		holder.userName.setText("Ha");
-//		holder.userLocation.setText("HCM");
-//		holder.dateUped.setText("20022002");
-//		holder.viewCount.setText("1000000");
  
 		return convertView;
 	}

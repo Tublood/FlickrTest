@@ -21,7 +21,10 @@ import org.json.JSONObject;
 import com.cnc.flickrtest.R;
 import com.cnc.flickrtest.utils.FlickrContainer;
 import com.googlecode.flickrjandroid.photos.Photo;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 import com.nostra13.universalimageloader.core.assist.SimpleImageLoadingListener;
 
 import android.app.Activity;
@@ -51,23 +54,34 @@ public class InfoActivity extends Activity implements OnTouchListener
 	private Photo 		photo;
 	private Bitmap 		image, avatar;
 	private String 		userNameString, userLocationString,
-						dateUpedString, viewCountString;
-	
+						dateUpedString, viewCountString;	
 	private ImageView 	view, avatarView;
 	private TextView 	userName, userLocation, dateUped, viewCount;
-	private WebView 	webview;
 	private Handler 	m_handler = new Handler();
 	private ListView 	commentListView;
 	private String		photoID;
 	private CommentListAdapter commentAdapter;
-	public FlickrContainer fc;
-	ViewPager pager;
+	public FlickrContainer 		fc;
+	private ImageLoader			imageLoader;
+	ViewPager 					pager;
+
+	private DisplayImageOptions options;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
 	{
 		super.onCreate(savedInstanceState);
 		fc = FlickrContainer.getInstance();
 		setContentView(R.layout.infor_layout);
+		
+		options = new DisplayImageOptions.Builder( ) 
+	        .resetViewBeforeLoading( ) 
+	        .imageScaleType( ImageScaleType.EXACTLY ) 
+	        .bitmapConfig( Bitmap.Config.RGB_565 ) 
+	        .cacheInMemory( ) 
+	        .cacheOnDisc( ) 
+	        .build( );
+		imageLoader		= ImageLoader.getInstance();
+		
 		Bundle bundle 	= getIntent().getExtras();
 		int position 	= bundle.getInt("position");
 //		this.photo 		= (Photo) bundle.get("photo");
@@ -78,21 +92,23 @@ public class InfoActivity extends Activity implements OnTouchListener
 //		this.userLocationString = (String) bundle.get("userlocation");
 //		this.dateUpedString 	= (String) bundle.get("dateuped");
 //		this.viewCountString 	= (String) bundle.get("viewcount");
-		this.photo 		= fc.getPhoto(position);
-		this.photoID	= photo.getId();
-		this.image 		= fc.getBitmap(position);
-		this.avatar 	= fc.getAvatar(position);
-		this.userNameString 	= fc.getUserName(position);
-		this.userLocationString = fc.getUserLocation(position);
-		this.dateUpedString 	= fc.getDateUped(position);
-		this.viewCountString 	= fc.getViewCount(position);
+		this.photo 				 = fc.getPhoto(position);
+		this.photoID			 = photo.getId();
+//		this.image 				 = fc.getBitmap(position);
+//		this.avatar 			 = fc.getAvatar(position);
+		this.userNameString 	 = fc.getUserName(position);
+		this.userLocationString	 = fc.getUserLocation(position);
+		this.dateUpedString 	 = fc.getDateUped(position);
+		this.viewCountString 	 = fc.getViewCount(position);
 		
 		view = (ImageView) findViewById(R.id.image_info);
-		view.setImageBitmap(image);
+		imageLoader.displayImage( fc.getURL( position ), view, options );
+//		view.setImageBitmap(image);
 		view.setOnTouchListener(this);
 		
 		avatarView = (ImageView) findViewById(R.id.avatar_info);
-		avatarView.setImageBitmap(avatar);
+//		avatarView.setImageBitmap(avatar);
+		imageLoader.displayImage( fc.getAvatarURL( position ), avatarView, options );
 		
 		userName = (TextView) findViewById(R.id.userName_info);
 		userName.setText(userNameString);
@@ -112,34 +128,6 @@ public class InfoActivity extends Activity implements OnTouchListener
 		commentListView.setAdapter(commentAdapter);
 		
 		processComment(this.photoID);
-
-//		pager = (ViewPager) findViewById(R.id.pager);
-//		pager.setAdapter(new ImagePagerAdapter());
-//		pager.setCurrentItem(position);
-		
-		
-		
-//		setContentView(R.layout.webview);
-//		webview = (WebView) findViewById(R.id.info_webView);
-//		webview.loadUrl("http://farm" + fc.getUserFarm(position)
-//				+ ".static.flickr.com/" + fc.getUserServer(position) +
-//				"/buddyicons/" + fc.getUserId(position)
-//				+ ".jpg");
-//		String avatar = "<html>"+ "<img src=\""+"http://farm" + fc.getUserFarm(position)
-//			+ ".static.flickr.com/" + fc.getUserServer(position) +
-//			"/buddyicons/" + fc.getUserId(position)
-//			+ ".jpg"+"\">"+"</html>";
-//		
-//		String name = "<html>"+ fc.getUserName(position)+"</html>";
-//		String location = "<html>"+ fc.getUserLocation(position)+"</html>";
-//		String date = "<html>"+ fc.getDateUped(position)+"</html>";
-//		String view = "<html>"+ fc.getViewCount(position)+"</html>";
-//		String img = "<html>"+ "<img src=\""+fc.getPhoto(position).getSmallUrl()+"\">"+"</html>";
-//		commentsString = new String();
-//		comment(fc.getPhoto(position).getId());
-//		webview.loadData(avatar +"</br>"+ name+"</br>"
-//				+location+"</br>"+date+"</br>"+view
-//				+"</br>"+img+"</br>"+ commentsString, "text/html", "UTF-8");
 	}
 	private String commentsString;
 	public void comment(final String photoID)
@@ -164,20 +152,19 @@ public class InfoActivity extends Activity implements OnTouchListener
 						final String userName	= photoComment.getString("authorname");
 						final String _content = photoComment.getString("_content");
 						String avatar = "<html>"+ "<img src=\""+"http://farm" + userFarm
-								+ ".static.flickr.com/" + userServer +
-								"/buddyicons/" + userid
-								+ ".jpg"+"\">"+"</html>";
+							+ ".static.flickr.com/" + userServer +
+							"/buddyicons/" + userid
+							+ ".jpg"+"\">"+"</html>";
 						String userNameString = "<html>"+ userName +"</html>";
 						String  commentString= "<html>"+ _content +"</html>";
 						commentsString = commentsString +"</br>"+ avatar +"</br>"
-								+userNameString+"</br>"+commentString+"</br>";
-						
-						
+							+userNameString+"</br>"+commentString+"</br>";							
 					}
 				} catch (JSONException e) 
 				{
 					e.printStackTrace();
-				}			}
+				}			
+			}
 		});
 		t.start();
 	}
@@ -205,22 +192,24 @@ public class InfoActivity extends Activity implements OnTouchListener
 					int size = comment.length();
 					for( int i = 0; i < size; i++  )
 					{
-						JSONObject photoComment = comment.getJSONObject(i);
-						final String userid 	= photoComment.getString("author");
-						final String userServer = photoComment.getString("iconserver");
-						final String userFarm	= photoComment.getString("iconfarm");
-						final String userName	= photoComment.getString("authorname");
+						JSONObject photoComment  = comment.getJSONObject(i);
+						final String userid 	 = photoComment.getString("author");
+						final String userServer	 = photoComment.getString("iconserver");
+						final String userFarm	 = photoComment.getString("iconfarm");
+						final String userName	 = photoComment.getString("authorname");
 						final String commentString = photoComment.getString("_content");
 						Log.d(userName, commentString);
-						final Bitmap bm = getAvatar(userFarm, userServer, userid);
+						final String avatarURL = getCommentAvatarUrl( userFarm, userServer, userid );
+//						final Bitmap bm = getAvatar(userFarm, userServer, userid);
 						m_handler.post(new Runnable() 
 						{
 							@Override
 							public void run() 
 							{
-								commentAdapter.addComment(commentString);
-								commentAdapter.addUserName(userName);
-								commentAdapter.addAvatar(bm);
+								commentAdapter.addComment( commentString );
+								commentAdapter.addUserName( userName );
+								commentAdapter.addAvatarUrl( avatarURL );
+//								commentAdapter.addAvatar(bm);
 								commentAdapter.notifyDataSetChanged();
 							}
 						});
@@ -286,12 +275,13 @@ public class InfoActivity extends Activity implements OnTouchListener
 		Bitmap bm = null;
 
 		String FlickrPhotoPath = "http://farm" + iconFarm
-				+ ".static.flickr.com/" + Server + "/buddyicons/" + nsid
-				+ ".jpg";
+			+ ".static.flickr.com/" + Server + "/buddyicons/" + nsid
+			+ ".jpg";
 
 		URL FlickrPhotoUrl = null;
 
-		try {
+		try 
+		{
 			FlickrPhotoUrl = new URL(FlickrPhotoPath);
 
 			HttpURLConnection httpConnection = (HttpURLConnection) FlickrPhotoUrl
@@ -301,130 +291,21 @@ public class InfoActivity extends Activity implements OnTouchListener
 			InputStream inputStream = httpConnection.getInputStream();
 			bm = BitmapFactory.decodeStream(inputStream);
 
-		} catch (MalformedURLException e) {
+		} catch (MalformedURLException e) 
+		{
 			e.printStackTrace();
-		} catch (IOException e) {
-
+		} catch (IOException e) 
+		{
 			e.printStackTrace();
 		}
 		return bm;
 	}
 	
-	private class ImagePagerAdapter extends PagerAdapter 
+	public String getCommentAvatarUrl(String iconFarm, String Server, String nsid)
 	{
-
-		private Photo 		photo;
-		private Bitmap 		image, avatar;
-		private String 		userNameString, userLocationString,
-							dateUpedString, viewCountString;
-		
-		private ImageView 	view, avatarView;
-		private TextView 	userName, userLocation, dateUped, viewCount;
-		private WebView 	webview;
-		private Handler 	m_handler = new Handler();
-		private ListView 	commentListView;
-		private String		photoID;
-		private CommentListAdapter commentAdapter;
-		public FlickrContainer fc;
-		private LayoutInflater inflater;
-
-		ImagePagerAdapter() 
-		{
-			inflater = getLayoutInflater();
-		}
-
-		@Override
-		public void destroyItem(ViewGroup container, int position, Object object) {
-			((ViewPager) container).removeView((View) object);
-		}
-
-		@Override
-		public void finishUpdate(View container) {
-		}
-
-		@Override
-		public int getCount() {
-			return FlickrContainer.getInstance().getLength();
-		}
-
-		@Override
-		public Object instantiateItem(ViewGroup view, int position) 
-		{
-			View imageLayout = inflater.inflate(R.layout.infor_layout, view, false);
-//			ImageView imageView = (ImageView) imageLayout.findViewById(R.id.image);
-//			final ProgressBar spinner = (ProgressBar) imageLayout.findViewById(R.id.loading);
-
-			
-			this.photo 		= fc.getPhoto(position);
-			this.photoID	= photo.getId();
-			this.image 		= fc.getBitmap(position);
-			this.avatar 	= fc.getAvatar(position);
-			this.userNameString 	= fc.getUserName(position);
-			this.userLocationString = fc.getUserLocation(position);
-			this.dateUpedString 	= fc.getDateUped(position);
-			this.viewCountString 	= fc.getViewCount(position);
-			
-			this.view = (ImageView) findViewById(R.id.image_info);
-			this.view.setImageBitmap(image);
-			this.view.setOnTouchListener(new OnTouchListener() 
-			{
-				
-				@Override
-				public boolean onTouch(View v, MotionEvent event) 
-				{
-					Intent t = new Intent(InfoActivity.this, ShowDetailActivity.class);
-					t.putExtra("photo", photo);
-					startActivity(t);
-					return false;
-				}
-			});
-			
-			avatarView = (ImageView) findViewById(R.id.avatar_info);
-			avatarView.setImageBitmap(avatar);
-			
-			userName = (TextView) findViewById(R.id.userName_info);
-			userName.setText(userNameString);
-			
-			userLocation = (TextView) findViewById(R.id.userLocation_info);
-			userLocation.setText(userLocationString);
-			
-			dateUped = (TextView) findViewById(R.id.dateUped_info);
-			dateUped.setText(dateUpedString);
-			
-			viewCount = (TextView) findViewById(R.id.viewCount_info);
-			viewCount.setText(viewCountString);
-
-			
-			commentAdapter = new CommentListAdapter(InfoActivity.this);
-			commentListView = (ListView) findViewById(R.id.listView_info);
-			commentListView.setAdapter(commentAdapter);
-			
-			processComment(this.photoID);
-			((ViewPager) view).addView(imageLayout, 0);
-			return imageLayout;
-		}
-
-		@Override
-		public boolean isViewFromObject(View view, Object object) 
-		{
-			return view.equals(object);
-		}
-
-		@Override
-		public void restoreState(Parcelable state, ClassLoader loader) 
-		{
-		}
-
-		@Override
-		public Parcelable saveState() 
-		{
-			return null;
-		}
-
-		@Override
-		public void startUpdate(View container) 
-		{
-		}
-		
+		String FlickrPhotoPath = "http://farm" + iconFarm
+			+ ".static.flickr.com/" + Server + "/buddyicons/" + nsid
+			+ ".jpg";
+		return FlickrPhotoPath;
 	}
 }

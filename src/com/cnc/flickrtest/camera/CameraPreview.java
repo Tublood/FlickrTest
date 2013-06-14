@@ -9,25 +9,22 @@ import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.hardware.Camera.CameraInfo;
 
-public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
-    private static final String TAG = "Camera";
-	private SurfaceHolder mHolder;
-    private Camera mCamera;
-    private Context context;
+public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback 
+{
+    private static final String 	TAG = "Camera";
+	private SurfaceHolder 			mHolder;
+    private Camera 					mCamera;
+    private Context 				context;
     public CameraPreview(Context context, Camera camera) 
     {
         super(context);
-        this.context = context;
-        Log.d("Context", "Context");
-        if (camera == null )
-        	Log.d("Nullcamera", "Null");
-        mCamera = camera;
-        if (mCamera == null )
-        	Log.d("NullmCamera", "Null");
+        this.context 	= context;
+        mCamera 		= camera;
         // Install a SurfaceHolder.Callback so we get notified when the
         // underlying surface is created and destroyed.
-        mHolder = getHolder();
+        mHolder 		= getHolder();
         mHolder.addCallback(this);
         // deprecated setting, but required on Android versions prior to 3.0
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
@@ -38,13 +35,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         // The Surface has been created, now tell the camera where to draw the preview.
         try 
         {
-        	if (mCamera == null )
-            	Log.d("Null1", "Null");
-        	if (holder == null )
-            	Log.d("Null2", "Null");
             mCamera.setPreviewDisplay(holder);
             setCameraDisplayOrientation((CameraActivity)context, 0, mCamera);
-//            mCamera.setDisplayOrientation(90);
             mCamera.startPreview();
         } catch (IOException e) 
         {
@@ -54,20 +46,13 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
     public void surfaceDestroyed(SurfaceHolder holder) 
     {
-        // empty. Take care of releasing the Camera preview in your activity.
-//    	if( mCamera != null)
-//    	{
-//    		mCamera.stopPreview();
-//    		mCamera.release();
-//    		mCamera = null;
-//    	}
+    	
     }
 
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) 
     {
         // If your preview can change or rotate, take care of those events here.
         // Make sure to stop the preview before resizing or reformatting it.
-
         if (mHolder.getSurface() == null)
         {
           // preview surface does not exist
@@ -91,32 +76,34 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         {
             mCamera.setPreviewDisplay(mHolder);
             mCamera.startPreview();
-
-        } catch (Exception e){
+        } catch (Exception e)
+        {
             Log.d(TAG, "Error starting camera preview: " + e.getMessage());
         }
     }
     
     public static void setCameraDisplayOrientation(Activity activity,
-            int cameraId, android.hardware.Camera camera) {
-        android.hardware.Camera.CameraInfo info =
-                new android.hardware.Camera.CameraInfo();
-        android.hardware.Camera.getCameraInfo(cameraId, info);
-        int rotation = activity.getWindowManager().getDefaultDisplay()
-                .getRotation();
+            int cameraId, android.hardware.Camera camera) 
+    {
+        CameraInfo info = new CameraInfo();
+        Camera.getCameraInfo(cameraId, info);
+        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
         int degrees = 0;
-        switch (rotation) {
-            case Surface.ROTATION_0: degrees = 0; break;
-            case Surface.ROTATION_90: degrees = 90; break;
-            case Surface.ROTATION_180: degrees = 180; break;
-            case Surface.ROTATION_270: degrees = 270; break;
+        switch (rotation) 
+        {
+            case Surface.ROTATION_0: 	degrees = 0; 	break;
+            case Surface.ROTATION_90: 	degrees = 90; 	break;
+            case Surface.ROTATION_180: 	degrees = 180; 	break;
+            case Surface.ROTATION_270: 	degrees = 270; 	break;
         }
 
         int result;
-        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) 
+        {
             result = (info.orientation + degrees) % 360;
             result = (360 - result) % 360;  // compensate the mirror
-        } else {  // back-facing
+        } else 
+        {  // back-facing
             result = (info.orientation - degrees + 360) % 360;
         }
         camera.setDisplayOrientation(result);

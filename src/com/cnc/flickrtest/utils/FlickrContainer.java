@@ -7,137 +7,181 @@ import android.graphics.Bitmap;
 
 import com.googlecode.flickrjandroid.photos.Photo;
 
-public class FlickrContainer 
+public class FlickrContainer
 {
-	public static FlickrContainer instance;
-	private List<Photo>  photos;
-	private List<Bitmap> bitmap;
-	private List<Bitmap> avatar;
-	private List<String> userName;
-	private List<String> userLocation;
-	private List<String> dateUped;
-	private List<String> viewCount;
-	private List<String> description;
-	private List<String> userID;
-	private List<String> userFarm;
-	private List<String> userServer;
-	
-	
+	public static FlickrContainer	instance;
+	private List<Photo >			photos;
+	private List<Bitmap >			bitmap;
+	private List<Bitmap >			avatar;
+	private List<String >			userName;
+	private List<String >			userLocation;
+	private List<String >			dateUped;
+	private List<String >			viewCount;
+	private List<String >			description;
+	private List<String >			userID;
+	private List<String >			userFarm;
+	private List<String >			userServer;
+	private List<String>			urls;
+	private List<String>			avatarUrls;
+
 	public static FlickrContainer getInstance()
 	{
-		if( instance == null )
+		if ( instance == null )
 		{
 			instance = new FlickrContainer();
 			return instance;
 		}
-		else return instance;
+		else
+			return instance;
 	}
-	
-	public FlickrContainer() 
+
+	public FlickrContainer()
 	{
 		photos 			= new ArrayList<Photo>();
-		bitmap			= new ArrayList<Bitmap>();
-		avatar			= new ArrayList<Bitmap>();
+		bitmap 			= new ArrayList<Bitmap>();
+		avatar 			= new ArrayList<Bitmap>();
 		userName 		= new ArrayList<String>();
 		userLocation 	= new ArrayList<String>();
 		dateUped 		= new ArrayList<String>();
-		viewCount	 	= new ArrayList<String>();
+		viewCount 		= new ArrayList<String>();
 		description 	= new ArrayList<String>();
-		userID		 	= new ArrayList<String>();
-		userFarm	 	= new ArrayList<String>();
-		userServer	 	= new ArrayList<String>();	
-				
+		userID 			= new ArrayList<String>();
+		userFarm 		= new ArrayList<String>();
+		userServer 		= new ArrayList<String>();
+		urls			= new ArrayList<String>();
+		avatarUrls		= new ArrayList<String>();
 	}
-	
-	public void addPhoto(Photo photo)
+
+	public void addPhoto( Photo photo )
 	{
-		photos.add(photo);
+		photos.add( photo );
 	}
-	public void addBitmap(Bitmap bm)
+
+	public void addBitmap( Bitmap bm )
 	{
-		bitmap.add(bm);
+		bitmap.add( bm );
 	}
-	public void addAvatar(Bitmap avatar)
+
+	public void addAvatar( Bitmap avatar )
 	{
-		this.avatar.add(avatar);
+		this.avatar.add( avatar );
 	}
+
 	public void addUserName( String userName )
 	{
-		this.userName.add(userName);
+		this.userName.add( userName );
 	}
+
 	public void addUserLocation( String userLocation )
 	{
-		this.userLocation.add(userLocation);
+		this.userLocation.add( userLocation );
 	}
+
 	public void addDateUped( String dateUped )
 	{
-		this.dateUped.add(dateUped);
+		this.dateUped.add( dateUped );
 	}
+
 	public void addViewCount( String viewCount )
 	{
-		this.viewCount.add(viewCount);
+		this.viewCount.add( viewCount );
 	}
+
 	public void addDescription( String description )
 	{
-		this.description.add(description);
+		this.description.add( description );
 	}
+
 	public void addUserID( String userID )
 	{
-		this.userID.add(userID);
+		this.userID.add( userID );
 	}
+
 	public void addUserFarm( String userFarm )
 	{
-		this.userFarm.add(userFarm);
+		this.userFarm.add( userFarm );
 	}
+
 	public void addUserServer( String userServer )
 	{
-		this.userServer.add(userServer);
+		this.userServer.add( userServer );
+	}
+
+	public void addURL(String url)
+	{
+		urls.add(url);
 	}
 	
-	public Photo getPhoto(int posistion )
+	public void addAvatarURL(String url)
 	{
-		return photos.get(posistion);
+		avatarUrls.add(url);
 	}
+	
+	public Photo getPhoto( int posistion )
+	{
+		return photos.get( posistion );
+	}
+
 	public Bitmap getBitmap( int position )
 	{
-		return bitmap.get(position);
+		return bitmap.get( position );
 	}
+
 	public Bitmap getAvatar( int position )
 	{
-		return avatar.get(position);
+		return avatar.get( position );
 	}
+
 	public String getUserName( int position )
 	{
-		return userName.get(position);
+		return userName.get( position );
 	}
+
 	public String getUserLocation( int position )
 	{
-		return userLocation.get(position);
+		return userLocation.get( position );
 	}
+
 	public String getDateUped( int position )
 	{
-		return dateUped.get(position);
+		return dateUped.get( position );
 	}
+
 	public String getViewCount( int position )
 	{
-		return viewCount.get(position);
+		return viewCount.get( position );
 	}
+
 	public String getUserId( int position )
 	{
-		return userID.get(position);
+		return userID.get( position );
 	}
+
 	public String getDescription( int position )
 	{
-		return description.get(position);
+		return description.get( position );
 	}
+
 	public String getUserFarm( int position )
 	{
-		return userFarm.get(position);
+		return userFarm.get( position );
 	}
+
 	public String getUserServer( int position )
 	{
-		return userServer.get(position);
+		return userServer.get( position );
 	}
+
+	public String getURL( int position )
+	{
+		return urls.get(position);
+	}
+	
+	public String getAvatarURL( int position )
+	{
+		return avatarUrls.get(position);
+	}
+	
 	public int getLength()
 	{
 		return userName.size();

@@ -25,46 +25,52 @@ import com.googlecode.flickrjandroid.oauth.OAuthToken;
  * @author yayu
  * 
  */
-public class OAuthTask extends AsyncTask<Void, Integer, String> {
+public class OAuthTask extends AsyncTask<Void,Integer,String >
+{
 
 	// private static final Logger logger = LoggerFactory
 	// .getLogger(OAuthTask.class);
-	private static final Uri OAUTH_CALLBACK_URI = Uri
-			.parse(FlickrjActivity.CALLBACK_SCHEME + "://oauth"); //$NON-NLS-1$
+	private static final Uri	OAUTH_CALLBACK_URI	= Uri
+														.parse( FlickrjActivity.CALLBACK_SCHEME
+															+ "://oauth" ); //$NON-NLS-1$
 
 	/**
 	 * The context.
 	 */
-	private Context mContext;
+	private Context				mContext;
 
 	/**
 	 * The progress dialog before going to the browser.
 	 */
-	private ProgressDialog mProgressDialog;
+	private ProgressDialog		mProgressDialog;
 
 	/**
 	 * Constructor.
 	 * 
 	 * @param context
 	 */
-	public OAuthTask(Context context) {
+	public OAuthTask( Context context )
+	{
 		super();
 		this.mContext = context;
 	}
 
 	@Override
-	protected void onPreExecute() {
+	protected void onPreExecute()
+	{
 		super.onPreExecute();
-		mProgressDialog = ProgressDialog.show(mContext,
-				"", "Generating the authorization request..."); //$NON-NLS-1$ //$NON-NLS-2$
-		mProgressDialog.setCanceledOnTouchOutside(true);
-		mProgressDialog.setCancelable(true);
-		mProgressDialog.setOnCancelListener(new OnCancelListener() {
+		mProgressDialog = ProgressDialog.show( mContext,
+			"", "Generating the authorization request..." ); //$NON-NLS-1$ //$NON-NLS-2$
+		mProgressDialog.setCanceledOnTouchOutside( true );
+		mProgressDialog.setCancelable( true );
+		mProgressDialog.setOnCancelListener( new OnCancelListener()
+		{
 			@Override
-			public void onCancel(DialogInterface dlg) {
-				OAuthTask.this.cancel(true);
+			public void onCancel( DialogInterface dlg )
+			{
+				OAuthTask.this.cancel( true );
 			}
-		});
+		} );
 	}
 
 	/*
@@ -73,16 +79,20 @@ public class OAuthTask extends AsyncTask<Void, Integer, String> {
 	 * @see android.os.AsyncTask#doInBackground(Params[])
 	 */
 	@Override
-	protected String doInBackground(Void... params) {
-		try {
+	protected String doInBackground( Void... params )
+	{
+		try
+		{
 			Flickr f = FlickrHelper.getInstance().getFlickr();
 			OAuthToken oauthToken = f.getOAuthInterface().getRequestToken(
-					OAUTH_CALLBACK_URI.toString());
-			saveTokenSecrent(oauthToken.getOauthTokenSecret());
+				OAUTH_CALLBACK_URI.toString() );
+			saveTokenSecrent( oauthToken.getOauthTokenSecret() );
 			URL oauthUrl = f.getOAuthInterface().buildAuthenticationUrl(
-					Permission.WRITE, oauthToken);
+				Permission.WRITE, oauthToken );
 			return oauthUrl.toString();
-		} catch (Exception e) {
+		}
+		catch ( Exception e )
+		{
 			//			logger.error("Error to oauth", e); //$NON-NLS-1$
 			return "error:" + e.getMessage(); //$NON-NLS-1$
 		}
@@ -93,23 +103,28 @@ public class OAuthTask extends AsyncTask<Void, Integer, String> {
 	 * 
 	 * @param tokenSecret
 	 */
-	private void saveTokenSecrent(String tokenSecret) {
+	private void saveTokenSecrent( String tokenSecret )
+	{
 		//		logger.debug("request token: " + tokenSecret); //$NON-NLS-1$
-		FlickrjActivity act = (FlickrjActivity) mContext;
-		act.saveOAuthToken(null, null, null, tokenSecret);
+		FlickrjActivity act = (FlickrjActivity)mContext;
+		act.saveOAuthToken( null, null, null, tokenSecret );
 		//		logger.debug("oauth token secret saved: {}", tokenSecret); //$NON-NLS-1$
 	}
 
 	@Override
-	protected void onPostExecute(String result) {
-		if (mProgressDialog != null) {
+	protected void onPostExecute( String result )
+	{
+		if ( mProgressDialog != null )
+		{
 			mProgressDialog.dismiss();
 		}
-		if (result != null && !result.startsWith("error")) { //$NON-NLS-1$
-			mContext.startActivity(new Intent(Intent.ACTION_VIEW, Uri
-					.parse(result)));
-		} else {
-			Toast.makeText(mContext, result, Toast.LENGTH_LONG).show();
+		if ( result != null && !result.startsWith( "error" ) ) { //$NON-NLS-1$
+			mContext.startActivity( new Intent( Intent.ACTION_VIEW, Uri
+				.parse( result ) ) );
+		}
+		else
+		{
+			Toast.makeText( mContext, result, Toast.LENGTH_LONG ).show();
 		}
 	}
 

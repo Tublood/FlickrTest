@@ -35,6 +35,10 @@ import com.googlecode.flickrjandroid.photos.SearchParameters;
 
 import android.app.Application;
 
+import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.novoda.imageloader.core.ImageManager;
 import com.novoda.imageloader.core.LoaderSettings;
 import com.novoda.imageloader.core.LoaderSettings.SettingsBuilder;
@@ -62,18 +66,16 @@ import android.widget.RelativeLayout;
 
 public class MainActivity extends Activity {
 
-	private Handler m_handler = new Handler();
-	private List<Photo> photoes = new ArrayList<Photo>();
-	private List<Bitmap> bitmaps = new ArrayList<Bitmap>();
-	private int page = 1;
-	private ImageView view;
-	private Button button, button2, button3;
-	private EditText editText;
-	private ListView listview;
-	private boolean isLoading;
-	private FlickrContainer fc;
-	private ImageListAdapter adapter;
-	public static ImageManager imageManager;
+	private 						Handler m_handler = new Handler();
+	private int 					page = 1;
+	private ImageView 				view;
+	private Button 					button, button2, button3;
+	private EditText 				editText;
+	private ListView 				listview;
+	private boolean 				isLoading;
+	private FlickrContainer 		fc;
+	private ImageListAdapter 		adapter;
+	public static ImageManager 	imageManager;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) 
@@ -81,15 +83,15 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 //		normalImageManagerSettings();
-		fc = FlickrContainer.getInstance();
-		button = (Button) findViewById(R.id.button1);
+		fc 		 = FlickrContainer.getInstance();
+		button 	 = (Button) findViewById(R.id.button1);
 		button2  = (Button) findViewById(R.id.button2);
 		button3  = (Button) findViewById(R.id.button3);
 		
 		editText = (EditText) findViewById(R.id.editText1);
-		view = (ImageView) findViewById(R.id.imageView1);
+		view 	 = (ImageView) findViewById(R.id.imageView1);
 		listview = (ListView) findViewById(R.id.listview);
-		adapter = new ImageListAdapter(this);
+		adapter  = new ImageListAdapter(this);
 		listview.setAdapter(adapter);
 		listview.setOnScrollListener(new ListView.OnScrollListener() 
 		{
@@ -119,7 +121,7 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) 
+				long arg3) 
 			{				
 				Intent t = new Intent(MainActivity.this, InfoActivity.class);
 				t.putExtra("position", arg2);
@@ -133,7 +135,6 @@ public class MainActivity extends Activity {
 			public void onClick(View arg0) 
 			{
 				newSearch(editText.getText().toString());
-				// search(editText.getText().toString());
 			}
 		});
 
@@ -143,8 +144,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View arg0) 
 			{
-				Log.d("TEST", "LAYOUT CHANGE");
-				
+				Log.d("TEST", "LAYOUT CHANGE");				
 				Intent t = new Intent(MainActivity.this, CameraActivity.class);
 				startActivity(t);
 				finish();
@@ -163,13 +163,16 @@ public class MainActivity extends Activity {
 			}
 		});
 
+		final ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder( this ) 
+	        .threadPriority( Thread.NORM_PRIORITY - 2 ) 
+	        .denyCacheImageMultipleSizesInMemory( ) 
+	        .discCacheFileNameGenerator( new Md5FileNameGenerator( ) ) 
+	        .tasksProcessingOrder( QueueProcessingType.FIFO ) 
+	        .enableLogging( ) // Not necessary in common 
+	        .build( ); 
+		// Initialize ImageLoader with configuration. 
+		ImageLoader.getInstance( ).init( config );
 	}
-
-//	private void normalImageManagerSettings() 
-//	{
-//		imageManager = new ImageManager(this, new SettingsBuilder()
-//				.withCacheManager(new LruBitmapCache(this)).build(this));
-//	}
 
 	@SuppressWarnings("unused")
 	private void verboseImageManagerSettings() 
@@ -216,7 +219,6 @@ public class MainActivity extends Activity {
 			{
 				String key = "2cb46fe99c9874b4ac741ce4a74e351c";
 				String svr = "www.flickr.com";
-
 				REST rest = null;
 				try 
 				{
@@ -239,7 +241,9 @@ public class MainActivity extends Activity {
 				PhotosInterface photosInterface = flickr.getPhotosInterface();
 				// Execute search with entered tags
 				PhotoList photoList = null;
-				try {
+				try 
+				{
+//					photoList = photosInterface.search(searchParams, 10, page);
 					photoList = photosInterface.search(searchParams, 10, page);
 				} catch (IOException e) 
 				{
@@ -266,35 +270,37 @@ public class MainActivity extends Activity {
 						final String url = photoList.get(i).getSmallUrl();
 						try 
 						{
-							final InputStream is = (InputStream) new URL(url)
-									.getContent();
-							final Bitmap bm = BitmapFactory.decodeStream(is);
+//							final InputStream is = (InputStream) new URL(url)
+//									.getContent();
+//							final Bitmap bm = BitmapFactory.decodeStream(is);
 							// Load user information
 
 							JSONObject JsonObject = new JSONObject(
-									QueryFlickrUser(photo.getId()));
+								QueryFlickrUser(photo.getId()));
 							final String userName = JsonObject.getJSONObject("photo")
-									.getJSONObject("owner")
-									.getString("username");
+								.getJSONObject("owner")
+								.getString("username");
 							final String userLocation = JsonObject.getJSONObject("photo")
-									.getJSONObject("owner")
-									.getString("location");
+								.getJSONObject("owner")
+								.getString("location");
 							final String date = JsonObject.getJSONObject("photo")
-									.getJSONObject("dates").getString("taken");
+								.getJSONObject("dates").getString("taken");
 							final String viewCount = JsonObject.getJSONObject("photo")
-									.getString("views");
+								.getString("views");
 							final String iconFarm = JsonObject.getJSONObject("photo")
-									.getJSONObject("owner")
-									.getString("iconfarm");
+								.getJSONObject("owner")
+								.getString("iconfarm");
 							final String server = JsonObject.getJSONObject("photo")
-									.getJSONObject("owner")
-									.getString("iconserver");
+								.getJSONObject("owner")
+								.getString("iconserver");
 							final String nsid = JsonObject.getJSONObject("photo")
-									.getJSONObject("owner").getString("nsid");
+								.getJSONObject("owner").getString("nsid");
 							final String description = JsonObject.getJSONObject("photo")
-									.getJSONObject("description").getString("_content");
-							final Bitmap avatar = getAvatar(iconFarm, server,
-									nsid);
+								.getJSONObject("description").getString("_content");
+//							final Bitmap avatar = getAvatar(iconFarm, server,
+//								nsid);
+							final String avatarUrl = getAvatarUrl( iconFarm, server,
+								nsid );
 //							final String a = userName, b = userLocation,
 //									c = date, d = viewCount, e = description;
 							m_handler.post(new Runnable() 
@@ -304,8 +310,10 @@ public class MainActivity extends Activity {
 								{
 									//add to adapter
 									adapter.addPhoto(photo);
-									adapter.addBitmap(bm);
-									adapter.addAvatar(avatar);
+//									adapter.addBitmap(bm);
+									adapter.addURL( url );
+									adapter.addAvatarURL( avatarUrl );
+//									adapter.addAvatar(avatar);
 									adapter.addUserName(userName);
 									adapter.addUserLocation(userLocation);
 									adapter.addPhotoDate(date);
@@ -315,8 +323,10 @@ public class MainActivity extends Activity {
 									Log.d("Load Image", "loaded");
 									//add to flick container
 									fc.addPhoto(photo);
-									fc.addBitmap(bm);
-									fc.addAvatar(avatar);
+									fc.addURL( url );
+									fc.addAvatarURL( avatarUrl );
+//									fc.addBitmap(bm);
+//									fc.addAvatar(avatar);
 									fc.addUserName(userName);
 									fc.addUserLocation(userLocation);
 									fc.addViewCount(viewCount);
@@ -326,9 +336,6 @@ public class MainActivity extends Activity {
 									fc.addUserServer(server);
 								}
 							});
-						} catch (final IOException e) 
-						{
-							e.printStackTrace();
 						} catch (JSONException e) 
 						{
 							e.printStackTrace();
@@ -438,5 +445,13 @@ public class MainActivity extends Activity {
 			e.printStackTrace();
 		}
 		return bm;
+	}
+	
+	public String getAvatarUrl(String iconFarm, String Server, String nsid)
+	{
+		String FlickrPhotoPath = "http://farm" + iconFarm
+			+ ".static.flickr.com/" + Server + "/buddyicons/" + nsid
+			+ ".jpg";
+		return FlickrPhotoPath;
 	}
 }

@@ -6,6 +6,9 @@ import java.util.List;
 
 import com.cnc.flickrtest.R;
 import com.googlecode.flickrjandroid.photos.Photo;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageScaleType;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -27,17 +30,31 @@ public class CommentListAdapter extends BaseAdapter
 		public TextView 	comment;
 		public ImageView 	avatar;
 	}
-	private Context 	context;
-	private List<Bitmap> avatar;
-	private List<String> usernames;
-	private List<String> comment;
+	private Context 		context;
+	private List<Bitmap> 	avatar;
+	private List<String> 	usernames;
+	private List<String> 	comment;
+	private List<String> 	avatarUrls;
+	
+	private ImageLoader		imageLoader;	
+	private DisplayImageOptions options;
+	
 	public CommentListAdapter(Context context) 
 	{	
 		this.context	= context;
-		avatar			= new ArrayList<Bitmap>();
+//		avatar			= new ArrayList<Bitmap>();
 		usernames		= new ArrayList<String>();
 		comment			= new ArrayList<String>();
-
+		avatarUrls		= new ArrayList<String>();
+		
+		options = new DisplayImageOptions.Builder( ) 
+	        .resetViewBeforeLoading( ) 
+	        .imageScaleType( ImageScaleType.EXACTLY ) 
+	        .bitmapConfig( Bitmap.Config.RGB_565 ) 
+	        .cacheInMemory( ) 
+	        .cacheOnDisc( ) 
+	        .build( );
+		imageLoader		= ImageLoader.getInstance();
 	}
 
 
@@ -54,7 +71,10 @@ public class CommentListAdapter extends BaseAdapter
 	{
 		this.comment.add(comment);
 	}
-	
+	public void addAvatarUrl( String url )
+	{
+		this.avatarUrls.add(url);
+	}
 	public Bitmap getAvatar(int position)
 	{
 		return avatar.get(position);
@@ -67,10 +87,15 @@ public class CommentListAdapter extends BaseAdapter
 	{
 		return comment.get(position);
 	}
+	public String getAvatarUrl( int position )
+	{
+		return avatarUrls.get(position);
+	}
 	public void clearSearchData()
 	{
 		usernames.clear();
-		avatar.clear();
+//		avatar.clear();
+		avatarUrls.clear();
 	}
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) 
@@ -84,7 +109,7 @@ public class CommentListAdapter extends BaseAdapter
 			holder				= new ViewHolder();
 			convertView 		= inflater.inflate(R.layout.comment_layout, parent, false);
 			holder.userName 	= (TextView) convertView.findViewById(R.id.comment_userName);
-			holder.comment	= (TextView) convertView.findViewById(R.id.comment_comment);
+			holder.comment		= (TextView) convertView.findViewById(R.id.comment_comment);
 			holder.avatar		= (ImageView) convertView.findViewById(R.id.comment_avatar);
 			convertView.setTag(holder);
 		}
@@ -92,7 +117,8 @@ public class CommentListAdapter extends BaseAdapter
 		{
 			holder =(ViewHolder)convertView.getTag();
 		}
-		holder.avatar.setImageBitmap(avatar.get(position));
+//		holder.avatar.setImageBitmap(avatar.get(position));
+		imageLoader.displayImage( getAvatarUrl( position ), holder.avatar, options );
 		holder.userName.setText(usernames.get(position));
 		holder.comment.setText(comment.get(position));
  

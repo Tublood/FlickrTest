@@ -10,57 +10,71 @@ import com.googlecode.flickrjandroid.oauth.OAuth;
 import com.googlecode.flickrjandroid.oauth.OAuthToken;
 import com.googlecode.flickrjandroid.photos.PhotosInterface;
 
+public final class FlickrHelper
+{
+	private static FlickrHelper	instance	= null;
+	private static final String	API_KEY		= "2cb46fe99c9874b4ac741ce4a74e351c";	//$NON-NLS-1$
+	public static final String	API_SEC		= "9e7551609585cadd";					//$NON-NLS-1$
 
-public final class FlickrHelper {
-
-	private static FlickrHelper instance = null;
-	private static final String API_KEY = "2cb46fe99c9874b4ac741ce4a74e351c"; //$NON-NLS-1$
-	public static final String API_SEC = "9e7551609585cadd"; //$NON-NLS-1$
-
-	private FlickrHelper() {
+	private FlickrHelper()
+	{
 
 	}
 
-	public static FlickrHelper getInstance() {
-		if (instance == null) {
+	public static FlickrHelper getInstance()
+	{
+		if ( instance == null )
+		{
 			instance = new FlickrHelper();
 		}
-
 		return instance;
 	}
 
-	public Flickr getFlickr() {
-		try {
-			Flickr f = new Flickr(API_KEY, API_SEC, new REST());
+	public Flickr getFlickr()
+	{
+		try
+		{
+			Flickr f = new Flickr( API_KEY, API_SEC, new REST() );
 			return f;
-		} catch (ParserConfigurationException e) {
+		}
+		catch ( ParserConfigurationException e )
+		{
 			return null;
 		}
 	}
 
-	public Flickr getFlickrAuthed(String token, String secret) {
+	public Flickr getFlickrAuthed( String token, String secret )
+	{
 		Flickr f = getFlickr();
 		RequestContext requestContext = RequestContext.getRequestContext();
 		OAuth auth = new OAuth();
-		auth.setToken(new OAuthToken(token, secret));
-		requestContext.setOAuth(auth);
+		auth.setToken( new OAuthToken( token, secret ) );
+		requestContext.setOAuth( auth );
 		return f;
 	}
 
-	public InterestingnessInterface getInterestingInterface() {
+	public InterestingnessInterface getInterestingInterface()
+	{
 		Flickr f = getFlickr();
-		if (f != null) {
+		if ( f != null )
+		{
 			return f.getInterestingnessInterface();
-		} else {
+		}
+		else
+		{
 			return null;
 		}
 	}
 
-	public PhotosInterface getPhotosInterface() {
+	public PhotosInterface getPhotosInterface()
+	{
 		Flickr f = getFlickr();
-		if (f != null) {
+		if ( f != null )
+		{
 			return f.getPhotosInterface();
-		} else {
+		}
+		else
+		{
 			return null;
 		}
 	}
